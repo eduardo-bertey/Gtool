@@ -1,0 +1,26 @@
+REM --- Comandos de una linea para compilar cada arquitectura de Android ---
+REM --- Ejecutar desde el directorio 'rust' ---
+
+REM --- aarch64-linux-android (ARM 64-bit) ---
+REM DEBUG
+set CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\aarch64-linux-android34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --target=aarch64-linux-android
+REM RELEASE
+set CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\aarch64-linux-android34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --release --target=aarch64-linux-android
+
+REM --- armv7-linux-androideabi (ARM 32-bit) ---
+REM DEBUG
+set CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\armv7a-linux-androideabi34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --target=armv7-linux-androideabi
+REM RELEASE
+set CARGO_TARGET_ARMV7_LINUX_ANDROIDEABI_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\armv7a-linux-androideabi34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --release --target=armv7-linux-androideabi
+
+REM --- i686-linux-android (x86 32-bit) ---
+REM DEBUG
+set CARGO_TARGET_I686_LINUX_ANDROID_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\i686-linux-android34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --target=i686-linux-android
+REM RELEASE
+set CARGO_TARGET_I686_LINUX_ANDROID_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\i686-linux-android34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --release --target=i686-linux-android
+
+REM --- x86_64-linux-android (x86 64-bit) ---
+REM DEBUG
+set CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\x86_64-linux-android34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --target=x86_64-linux-android
+REM RELEASE
+set CARGO_TARGET_X86_64_LINUX_ANDROID_LINKER=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\x86_64-linux-android34-clang.cmd && set CLANG_PATH=%ANDROID_NDK_HOME%\toolchains\llvm\prebuilt\windows-x86_64\bin\clang.cmd && cargo build --release --target=x86_64-linux-android

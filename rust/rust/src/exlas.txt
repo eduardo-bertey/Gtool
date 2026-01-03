@@ -1,0 +1,29 @@
+#[func]
+fn get_ips(&self) -> GString {
+	let ips = match GLOBAL_IPS.lock() {
+		Ok(i) => i,
+		Err(_) => return GString::from("[ERROR DE MUTEX IPs]"),
+	};
+
+	let http = match GLOBAL_HTTP.lock() {
+		Ok(h) => h,
+		Err(_) => return GString::from("[ERROR DE MUTEX HTTP]"),
+	};
+
+	let ip_str = if ips.is_empty() {
+		"[SIN IPs]".to_string()
+	} else {
+		format!("IPs actuales: {}", ips.join(", "))
+		
+		   
+	};
+
+	let http_str = if http.is_empty() {
+		"[SIN HTTP]".to_string()
+	} else {
+		format!("HTTP parseado: {}", http.join(", "))
+	};
+
+	GString::from(format!("{}\n{}", ip_str, http_str))
+   
+}

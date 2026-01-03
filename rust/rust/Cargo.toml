@@ -1,0 +1,58 @@
+[package]
+name = "Gtool"
+version = "1.0.0"
+edition = "2024"
+license = "MIT"
+
+[dependencies]
+godot = { version = "0.4.2", features = ["experimental-threads"] }
+
+pkarr = {  version = "5.0.0", features = ["full"] }
+futures = "0.3"
+
+#anyhow = "1"
+thiserror = "1"
+
+
+anyhow = "1.0.68"                                                  # ergonomic error handling with context support (e.g., `anyhow::Result`)
+bytes = "1.3.0"                                                    # for managing and manipulating byte buffers (used in torrent data exchange)
+#clap = { version = "4.0.32", features = ["derive"] }               # command-line argument parser (for building CLI interfaces)
+hex = "0.4.3"                                                      # for hex encoding/decoding (used in info-hash/logging)
+regex = "1"                                                        # regular expressions (e.g., validating tracker URLs or parsing responses)
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+
+serde_bencode = "0.2.3"                                            # for parsing `.torrent` files (Bencode format)
+serde_bytes = "0.11.12"                                            # allows compact encoding of `Vec<u8>` as raw bytes (used in peer messages)
+serde_json = "1.0"
+
+serde = { version = "1.0.136", features = ["derive"] }             # serialization framework used by many formats like JSON, Bencode
+sha1 = "0.10.1" 
+rand = "0.8"  
+once_cell = "1.18.0"
+
+#[dependencies]
+crossterm = { version = "0.28.1", features = ["event-stream"] }
+ratatui = "0.29.0"
+tokio = { version = "1.44.1", features = ["full"] }
+#nostr-sdk = { version = "0.40.0", features = ["nip44", "nip59"] }
+clap = { version = "4.5.32", features = ["derive"] }
+
+rpassword = "7"
+
+# ---- NOSTR STACK (PINNED) ----
+nostr-sdk = { version = "=0.43.0", features = ["nip44", "nip59"] }
+nostr = "=0.43.1"
+nostringer = "0.1.8"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+#panic = "abort"
+strip = true
+
+
+
+
+[lib]
+crate-type = ["cdylib"] # Compile this crate to a dynamic C library.

@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://c7iskwgu5aphr"]
+
+[ext_resource type="Texture2D" uid="uid://dcvpakna8i04d" path="res://godot-rust.png" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://djc7rnpo0urnw" path="res://example_godot/player.gd" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://olvw4jghlq48" path="res://example_godot/torrentgd/peerinfo.gd" id="3_h2yge"]
+
+[node name="Node2D" type="Node2D" unique_id=527697864]
+
+[node name="Player" type="Player" parent="." unique_id=1791554876]
+position = Vector2(493, 328)
+texture = ExtResource("1_ig7tw")
+script = ExtResource("2_0xm2m")
+
+[node name="Label" type="Label" parent="." unique_id=2021983347]
+offset_left = 78.0
+offset_top = 182.0
+offset_right = 305.0
+offset_bottom = 244.0
+
+[node name="Peerinfo" type="Peerinfo" parent="." unique_id=1861476763]
+script = ExtResource("3_h2yge")
+
+[connection signal="ips_actualizadas" from="Peerinfo" to="Peerinfo" method="_on_ips_actualizadas"]
+[connection signal="string_format" from="Peerinfo" to="Player" method="_on_peerinfo_string_format"]

@@ -1,0 +1,241 @@
+[gd_scene format=3 uid="uid://hv7gogmh6wkt"]
+
+[ext_resource type="Script" uid="uid://vr63fhaxmgbq" path="res://example_godot/notrngd/nostr_demo1.gd" id="1_dcsbv"]
+[ext_resource type="Script" uid="uid://bfs3rlghb2g6l" path="res://example_godot/notrngd/nostr_demo2.gd" id="2_3om6m"]
+[ext_resource type="Script" uid="uid://bo7d7nxw0k3me" path="res://example_godot/notrngd/relayedit.gd" id="3_km8v1"]
+
+[node name="Node2" type="Node" unique_id=2087121732]
+script = ExtResource("1_dcsbv")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2007230617]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.007843138, 0.07450981, 0.24705882, 1)
+
+[node name="TabContainer" type="TabContainer" parent="." unique_id=1079235692]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 2
+
+[node name="CHAT 1" type="Control" parent="TabContainer" unique_id=426822988]
+visible = false
+layout_mode = 2
+script = ExtResource("1_dcsbv")
+metadata/_tab_index = 0
+
+[node name="send" type="Button" parent="TabContainer/CHAT 1" unique_id=864927402]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 198.0
+offset_right = -957.0
+offset_bottom = -388.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "enviar msg"
+
+[node name="msg" type="TextEdit" parent="TabContainer/CHAT 1" unique_id=1544553114]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 32.0
+offset_right = 233.0
+offset_bottom = 176.0
+placeholder_text = "enter text"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/CHAT 1" unique_id=1852681725]
+layout_mode = 0
+offset_left = 456.0
+offset_top = 39.0
+offset_right = 898.0
+offset_bottom = 545.0
+
+[node name="Label" type="Label" parent="TabContainer/CHAT 1/ScrollContainer" unique_id=1105933333]
+layout_mode = 2
+text = "desde peer 1"
+
+[node name="nsec" type="LineEdit" parent="TabContainer/CHAT 1" unique_id=1807146482]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 285.0
+offset_right = 614.0
+offset_bottom = 330.0
+text = "nsec1a2z2njkffkujcxxel0e336dakdgwnynztxkhku2r5sf2a7uslc7q88j0xr"
+placeholder_text = "mi nsec"
+
+[node name="npub" type="LineEdit" parent="TabContainer/CHAT 1" unique_id=1040434356]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 356.0
+offset_right = 609.0
+offset_bottom = 387.0
+text = "npub1vxuutunznedrszssxzyw6qxn5anc67xxm934vqsj8cdk7ap3ze3qw444pn"
+placeholder_text = "otro npub"
+
+[node name="chat_app" type="Button" parent="TabContainer/CHAT 1" unique_id=935682555]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 405.0
+offset_right = 136.0
+offset_bottom = 454.0
+text = "run chat"
+
+[node name="CHAT 2" type="Control" parent="TabContainer" unique_id=108273825]
+visible = false
+layout_mode = 2
+script = ExtResource("2_3om6m")
+metadata/_tab_index = 1
+
+[node name="send" type="Button" parent="TabContainer/CHAT 2" unique_id=1925096631]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 47.0
+offset_top = 198.0
+offset_right = -989.0
+offset_bottom = -388.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "enviar msg"
+
+[node name="msg" type="TextEdit" parent="TabContainer/CHAT 2" unique_id=2068515958]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 32.0
+offset_right = 233.0
+offset_bottom = 176.0
+placeholder_text = "enter text"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/CHAT 2" unique_id=985747900]
+layout_mode = 0
+offset_left = 456.0
+offset_top = 39.0
+offset_right = 898.0
+offset_bottom = 545.0
+
+[node name="Label" type="Label" parent="TabContainer/CHAT 2/ScrollContainer" unique_id=923642476]
+layout_mode = 2
+text = "desde peer 2"
+
+[node name="nsec" type="LineEdit" parent="TabContainer/CHAT 2" unique_id=1776279037]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 285.0
+offset_right = 614.0
+offset_bottom = 330.0
+text = "nsec1cg99f0q7ptvn6w0r2hfns848ses28jqnp40vs4v0s7e67fg88u0sdvqljj"
+placeholder_text = "mi nsec"
+
+[node name="npub" type="LineEdit" parent="TabContainer/CHAT 2" unique_id=1351505627]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 356.0
+offset_right = 609.0
+offset_bottom = 387.0
+text = "npub1x20uef6xzepy5ygzp92trw27prdy7v3gqxqeed24tlmr5cht5gdsazrq2v"
+placeholder_text = "otro npub"
+
+[node name="chat_app" type="Button" parent="TabContainer/CHAT 2" unique_id=1531779227]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 405.0
+offset_right = 136.0
+offset_bottom = 454.0
+text = "run chat"
+
+[node name="relayedit" type="Control" parent="TabContainer" unique_id=505942342]
+layout_mode = 2
+script = ExtResource("3_km8v1")
+metadata/_tab_index = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabContainer/relayedit" unique_id=1964053203]
+layout_mode = 0
+offset_left = 510.0
+offset_top = 12.0
+offset_right = 1064.0
+offset_bottom = 541.0
+
+[node name="relays" type="Label" parent="TabContainer/relayedit/ScrollContainer" unique_id=347124819]
+layout_mode = 2
+text = "RELAYS:
+
+"
+
+[node name="editerelay" type="LineEdit" parent="TabContainer/relayedit" unique_id=72884150]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 316.0
+offset_right = -668.0
+offset_bottom = -249.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "wss://relay.mostro.network"
+placeholder_text = "relay"
+
+[node name="indexrelay" type="LineEdit" parent="TabContainer/relayedit/editerelay" unique_id=78423308]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 101.0
+offset_right = 191.0
+offset_bottom = 132.0
+placeholder_text = "select relay number"
+
+[node name="addrelay" type="Button" parent="TabContainer/relayedit/editerelay" unique_id=917080278]
+layout_mode = 0
+offset_left = -2.0
+offset_top = 54.0
+offset_right = 177.0
+offset_bottom = 94.0
+text = "add relay"
+
+[node name="quitrelay" type="Button" parent="TabContainer/relayedit/editerelay" unique_id=869594473]
+layout_mode = 0
+offset_top = 139.0
+offset_right = 128.0
+offset_bottom = 179.0
+text = "quit relay"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/relayedit" unique_id=1912805192]
+layout_mode = 0
+offset_left = 197.0
+offset_top = 369.0
+offset_right = 431.0
+offset_bottom = 410.0
+
+[node name="load" type="Button" parent="TabContainer/relayedit/HBoxContainer" unique_id=1033378206]
+layout_mode = 2
+text = "load"
+
+[node name="save" type="Button" parent="TabContainer/relayedit/HBoxContainer" unique_id=163185830]
+layout_mode = 2
+text = "save"
+
+[node name="Button" type="Button" parent="." unique_id=8242349]
+offset_left = 1035.0
+offset_top = 3.0
+offset_right = 1144.0
+offset_bottom = 35.0
+text = "Quit (X) "
+
+[connection signal="pressed" from="TabContainer/CHAT 1/send" to="." method="_on_send_pressed"]
+[connection signal="pressed" from="TabContainer/CHAT 1/chat_app" to="." method="_on_chat_app_pressed"]
+[connection signal="pressed" from="TabContainer/CHAT 2/send" to="TabContainer/CHAT 2" method="_on_send_pressed"]
+[connection signal="pressed" from="TabContainer/CHAT 2/chat_app" to="TabContainer/CHAT 2" method="_on_chat_app_pressed"]
+[connection signal="pressed" from="TabContainer/relayedit/editerelay/addrelay" to="TabContainer/relayedit" method="_on_addrelay_pressed"]
+[connection signal="pressed" from="TabContainer/relayedit/editerelay/quitrelay" to="TabContainer/relayedit" method="_on_quitrelay_pressed"]
+[connection signal="pressed" from="TabContainer/relayedit/HBoxContainer/load" to="TabContainer/relayedit" method="_on_button_2_pressed"]
+[connection signal="pressed" from="TabContainer/relayedit/HBoxContainer/save" to="TabContainer/relayedit" method="_on_button_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

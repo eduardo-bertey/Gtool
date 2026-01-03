@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://dciy365bqdbyx"]
+
+[ext_resource type="Script" uid="uid://olvw4jghlq48" path="res://example_godot/torrentgd/peerinfo.gd" id="1_3c2o6"]
+
+[node name="torrent http" type="TPeer" unique_id=935380593]
+script = ExtResource("1_3c2o6")
+
+[node name="Timer" type="Timer" parent="." unique_id=827511760]
+wait_time = 30.0
+autostart = true
+
+[connection signal="ips_actualizadas" from="." to="." method="_on_ips_actualizadas"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

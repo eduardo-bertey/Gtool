@@ -1,0 +1,323 @@
+[gd_scene format=3 uid="uid://chwmec8gh3b04"]
+
+[ext_resource type="Script" uid="uid://b8elavjpyi0u6" path="res://example_godot/notrngd/nostrn_prueba_observador.gd" id="1_06f07"]
+[ext_resource type="Script" uid="uid://bo7d7nxw0k3me" path="res://example_godot/notrngd/relayedit.gd" id="1_r2swp"]
+[ext_resource type="Script" uid="uid://dxawfe0crrmev" path="res://example_godot/notrngd/mostro_peer1.gd" id="2_06f07"]
+[ext_resource type="Script" uid="uid://bilhr4fe0jerh" path="res://example_godot/notrngd/mostro_peer2.gd" id="3_35dqd"]
+[ext_resource type="Script" uid="uid://c7dg43g6svpey" path="res://example_godot/notrngd/mostro_observer.gd" id="4_jf82l"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i83a2"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.101960786, 0.101960786, 0.5019608, 0.6)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.29411766, 0.5803922, 1, 1)
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_q0riu"]
+bg_color = Color(0.11764706, 0, 0.5647059, 1)
+border_width_left = 3
+border_color = Color(0.35686275, 0.023529412, 0.8, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v3ivi"]
+bg_color = Color(0.2901961, 0.07058824, 0.7372549, 1)
+border_width_right = 4
+border_color = Color(0.29411766, 0.21960784, 0.8627451, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="nostrn prueba observador" type="Control" unique_id=72516252]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_06f07")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=990594802]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.016510928, 0.18438336, 1)
+
+[node name="siwch" type="TabContainer" parent="." unique_id=1761169648]
+layout_mode = 0
+offset_left = 42.0
+offset_top = 29.0
+offset_right = 1117.0
+offset_bottom = 616.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_i83a2")
+theme_override_styles/tab_unselected = SubResource("StyleBoxFlat_q0riu")
+theme_override_styles/tab_selected = SubResource("StyleBoxFlat_v3ivi")
+current_tab = 0
+tabs_rearrange_group = 1
+
+[node name="relayedit" type="Control" parent="siwch" unique_id=1135704658]
+layout_mode = 2
+script = ExtResource("1_r2swp")
+metadata/_tab_index = 0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="siwch/relayedit" unique_id=1084401151]
+layout_mode = 0
+offset_left = 510.0
+offset_top = 12.0
+offset_right = 1064.0
+offset_bottom = 541.0
+
+[node name="relays" type="Label" parent="siwch/relayedit/ScrollContainer" unique_id=1240547006]
+layout_mode = 2
+text = "RELAYS:
+
+"
+
+[node name="editerelay" type="LineEdit" parent="siwch/relayedit" unique_id=901749219]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 316.0
+offset_right = -586.0
+offset_bottom = -191.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "wss://relay.mostro.network"
+placeholder_text = "relay"
+
+[node name="indexrelay" type="LineEdit" parent="siwch/relayedit/editerelay" unique_id=1540858676]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 101.0
+offset_right = 191.0
+offset_bottom = 132.0
+placeholder_text = "select relay number"
+
+[node name="addrelay" type="Button" parent="siwch/relayedit/editerelay" unique_id=751602783]
+layout_mode = 0
+offset_left = -2.0
+offset_top = 54.0
+offset_right = 177.0
+offset_bottom = 94.0
+text = "add relay"
+
+[node name="quitrelay" type="Button" parent="siwch/relayedit/editerelay" unique_id=120131109]
+layout_mode = 0
+offset_top = 139.0
+offset_right = 128.0
+offset_bottom = 179.0
+text = "quit relay"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="siwch/relayedit" unique_id=1645877098]
+layout_mode = 0
+offset_left = 197.0
+offset_top = 369.0
+offset_right = 431.0
+offset_bottom = 410.0
+
+[node name="load" type="Button" parent="siwch/relayedit/HBoxContainer" unique_id=2033164790]
+layout_mode = 2
+text = "load"
+
+[node name="save" type="Button" parent="siwch/relayedit/HBoxContainer" unique_id=963467972]
+layout_mode = 2
+text = "save"
+
+[node name="peer 1" type="Control" parent="siwch" unique_id=1298883092]
+visible = false
+clip_contents = true
+layout_mode = 2
+script = ExtResource("2_06f07")
+metadata/_tab_index = 1
+
+[node name="conect 1" type="Button" parent="siwch/peer 1" unique_id=896575510]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 134.0
+offset_bottom = 34.0
+text = "conectar peer 1"
+
+[node name="TextEdit" type="TextEdit" parent="siwch/peer 1" unique_id=1729566933]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 35.0
+offset_right = 266.0
+offset_bottom = 314.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="siwch/peer 1" unique_id=1735562936]
+layout_mode = 0
+offset_left = 377.0
+offset_top = 27.0
+offset_right = 1079.0
+offset_bottom = 540.0
+
+[node name="mensaje" type="Label" parent="siwch/peer 1/ScrollContainer" unique_id=1889817786]
+layout_mode = 2
+text = "peer 1
+
+"
+
+[node name="enviar" type="Button" parent="siwch/peer 1" unique_id=2059936871]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 324.0
+offset_right = 247.0
+offset_bottom = 359.0
+text = "enviar"
+
+[node name="peernsec" type="LineEdit" parent="siwch/peer 1" unique_id=35316916]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 409.0
+offset_right = 613.0
+offset_bottom = 440.0
+text = "ea84a9cac94db92c18d9fbf318e9bdb350e9926259ad7b7143a412aefb90fe3c"
+placeholder_text = "nsec"
+
+[node name="peernpub" type="LineEdit" parent="siwch/peer 1" unique_id=871359740]
+layout_mode = 0
+offset_left = 13.0
+offset_top = 437.0
+offset_right = 613.0
+offset_bottom = 468.0
+text = "61b9c5f2629e5a380a103088ed00d3a7678d78c6d9635602123e1b6f74311662"
+placeholder_text = "npub"
+
+[node name="peer 2" type="Control" parent="siwch" unique_id=440796518]
+visible = false
+clip_contents = true
+layout_mode = 2
+script = ExtResource("3_35dqd")
+metadata/_tab_index = 2
+
+[node name="conect 2" type="Button" parent="siwch/peer 2" unique_id=173397967]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = 134.0
+offset_bottom = 34.0
+text = "conectar peer 2"
+
+[node name="TextEdit" type="TextEdit" parent="siwch/peer 2" unique_id=1476054915]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 35.0
+offset_right = 266.0
+offset_bottom = 314.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="siwch/peer 2" unique_id=1665089911]
+layout_mode = 0
+offset_left = 377.0
+offset_top = 27.0
+offset_right = 1079.0
+offset_bottom = 540.0
+
+[node name="mensaje" type="Label" parent="siwch/peer 2/ScrollContainer" unique_id=153229445]
+layout_mode = 2
+text = "peer 2
+
+"
+
+[node name="enviar" type="Button" parent="siwch/peer 2" unique_id=1227047145]
+layout_mode = 0
+offset_left = 43.0
+offset_top = 324.0
+offset_right = 247.0
+offset_bottom = 359.0
+text = "enviar"
+
+[node name="peernsec" type="LineEdit" parent="siwch/peer 2" unique_id=1768704221]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 410.0
+offset_right = 615.0
+offset_bottom = 441.0
+text = "c20a54bc1e0ad93d39e355d3381ea78660a3c8130d5ec8558f87b3af25073f1f"
+placeholder_text = "nsec"
+
+[node name="peernpub" type="LineEdit" parent="siwch/peer 2" unique_id=69721384]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 438.0
+offset_right = 615.0
+offset_bottom = 469.0
+text = "329fcca74616424a11020954b1b95e08da4f322801819cb5555ff63a62eba21b"
+placeholder_text = "npub"
+
+[node name="observer" type="Control" parent="siwch" unique_id=1876933229]
+visible = false
+clip_contents = true
+layout_mode = 2
+script = ExtResource("4_jf82l")
+metadata/_tab_index = 3
+
+[node name="observer" type="Button" parent="siwch/observer" unique_id=678488600]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 41.0
+offset_right = 128.0
+offset_bottom = 127.0
+text = "observer"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="siwch/observer" unique_id=2052850053]
+layout_mode = 0
+offset_left = 217.0
+offset_top = 44.0
+offset_right = 1068.0
+offset_bottom = 544.0
+
+[node name="mensaje" type="Label" parent="siwch/observer/ScrollContainer" unique_id=922054544]
+layout_mode = 2
+text = "observador : 
+
+"
+
+[node name="shared key" type="TextEdit" parent="siwch/observer" unique_id=565833874]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 237.0
+offset_right = 222.0
+offset_bottom = 377.0
+text = "fa659b9d3718b926ecd67cdf33a93599579db09d95763fa444cd25d0a70d14c5"
+placeholder_text = "shared_key"
+wrap_mode = 1
+
+[node name="Button" type="Button" parent="." unique_id=1458418847]
+layout_mode = 0
+offset_left = 1019.0
+offset_top = 5.0
+offset_right = 1143.0
+offset_bottom = 53.0
+text = "Quit (X)"
+
+[connection signal="pressed" from="siwch/relayedit/editerelay/addrelay" to="siwch/relayedit" method="_on_addrelay_pressed"]
+[connection signal="pressed" from="siwch/relayedit/editerelay/quitrelay" to="siwch/relayedit" method="_on_quitrelay_pressed"]
+[connection signal="pressed" from="siwch/relayedit/HBoxContainer/load" to="siwch/relayedit" method="_on_button_2_pressed"]
+[connection signal="pressed" from="siwch/relayedit/HBoxContainer/save" to="siwch/relayedit" method="_on_button_pressed"]
+[connection signal="pressed" from="siwch/peer 1/conect 1" to="siwch/peer 1" method="_on_conect_1_pressed"]
+[connection signal="pressed" from="siwch/peer 1/enviar" to="siwch/peer 1" method="_on_enviar_pressed"]
+[connection signal="pressed" from="siwch/peer 2/conect 2" to="siwch/peer 2" method="_on_peer_2_pressed"]
+[connection signal="pressed" from="siwch/peer 2/enviar" to="siwch/peer 2" method="_on_button_pressed"]
+[connection signal="pressed" from="siwch/observer/observer" to="siwch/observer" method="_on_observer_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

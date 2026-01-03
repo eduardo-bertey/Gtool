@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://b8m5farrxfwi5"]
+
+[ext_resource type="Script" uid="uid://bilhr4fe0jerh" path="res://example_godot/notrngd/mostro_peer2.gd" id="1_xklnt"]
+
+[node name="test" type="Control" unique_id=553705226]
+visible = false
+clip_contents = true
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_xklnt")
+metadata/_tab_index = 3
+
+[node name="peer 2" type="Button" parent="." unique_id=9107956]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 6.0
+offset_right = 116.0
+offset_bottom = 37.0
+text = "conect peer 2"
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=1398366020]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 38.0
+offset_right = 328.0
+offset_bottom = 249.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=907154582]
+layout_mode = 0
+offset_left = 379.0
+offset_right = 1078.0
+offset_bottom = 559.0
+
+[node name="mensaje" type="Label" parent="ScrollContainer" unique_id=1281235220]
+layout_mode = 2
+text = "peer 2
+
+"
+
+[node name="Button" type="Button" parent="." unique_id=777545651]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 293.0
+offset_right = 181.0
+offset_bottom = 335.0
+text = "enviar"
+
+[node name="peernsec" type="LineEdit" parent="." unique_id=867024541]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 400.0
+offset_right = 379.0
+offset_bottom = 431.0
+text = "06d4c46694acb83523b0a5b164e95c92452ac3b58edfffc4109343af826189d7"
+placeholder_text = "nsec"
+
+[node name="peernpub" type="LineEdit" parent="." unique_id=867028696]
+layout_mode = 0
+offset_left = -4.0
+offset_top = 435.0
+offset_right = 378.0
+offset_bottom = 480.0
+text = "22537c6e1e56ababb2b0ca0bffff6748e50fc18d496e3a7458bb721f97d6e337"
+placeholder_text = "npub"
+
+[connection signal="pressed" from="peer 2" to="." method="_on_peer_2_pressed"]
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
