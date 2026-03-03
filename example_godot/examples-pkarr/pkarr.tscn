@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://c2qb1lhdrail3"]
 
-[ext_resource type="Script" uid="uid://cbmm4qplwm12h" path="res://example_godot/examples-pkarr/control.gd" id="1_0fbet"]
-[ext_resource type="Script" uid="uid://b1hvxmg5qhl1e" path="res://example_godot/examples-pkarr/button_3.gd" id="2_62e2m"]
+[ext_resource type="Script" uid="uid://o416t0ckjfwa" path="res://example_godot/examples-pkarr/control.gd" id="1_0fbet"]
+[ext_resource type="Script" uid="uid://d0ovu0es7j3ju" path="res://example_godot/examples-pkarr/button_3.gd" id="2_62e2m"]
+[ext_resource type="Script" uid="uid://dbswwj815s38d" path="res://example_godot/examples-pkarr/key_vault.gd" id="3_ahawr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_202ya"]
 bg_color = Color(0.84209746, 0.5075795, 0.20788595, 1)
@@ -127,22 +128,6 @@ offset_right = 520.0
 offset_bottom = 74.0
 text = "exit"
 
-[node name="crea key" type="Button" parent="." unique_id=1668977059]
-layout_mode = 0
-offset_left = 400.0
-offset_top = 88.0
-offset_right = 477.0
-offset_bottom = 119.0
-text = "crea key "
-
-[node name="save key" type="Button" parent="." unique_id=131235780]
-layout_mode = 0
-offset_left = 401.0
-offset_top = 129.0
-offset_right = 475.0
-offset_bottom = 160.0
-text = "save key"
-
 [node name="time_ttl" type="HSlider" parent="." unique_id=600960404]
 layout_mode = 0
 offset_left = 94.0
@@ -164,10 +149,43 @@ offset_top = 218.0
 offset_right = 83.0
 offset_bottom = 249.0
 
+[node name="key_vault" type="Control" parent="." unique_id=2067883863]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_ahawr")
+
+[node name="LineEdit" type="LineEdit" parent="key_vault" unique_id=1730878550]
+layout_mode = 0
+offset_left = 414.0
+offset_top = 107.0
+offset_right = 560.0
+offset_bottom = 144.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="key_vault" unique_id=691274021]
+layout_mode = 0
+offset_left = 174.0
+offset_top = 107.0
+offset_right = 406.0
+offset_bottom = 147.0
+
+[node name="save key" type="Button" parent="key_vault/HBoxContainer" unique_id=131235780]
+layout_mode = 2
+text = "save key"
+
+[node name="load_key" type="Button" parent="key_vault/HBoxContainer" unique_id=182217594]
+layout_mode = 2
+text = "load key"
+
+[node name="crea key" type="Button" parent="key_vault/HBoxContainer" unique_id=1668977059]
+layout_mode = 2
+text = "crea key "
+
 [connection signal="pressed" from="resolver" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="pubicar" to="." method="_on_button_2_pressed"]
 [connection signal="pressed" from="Button3" to="Button3" method="_on_pressed"]
 [connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]
-[connection signal="pressed" from="crea key" to="." method="_on_crea_key_pressed"]
-[connection signal="pressed" from="save key" to="." method="_on_save_key_pressed"]
 [connection signal="value_changed" from="time_ttl" to="." method="_on_time_ttl_value_changed"]
+[connection signal="pressed" from="key_vault/HBoxContainer/save key" to="." method="_on_save_key_pressed"]
+[connection signal="pressed" from="key_vault/HBoxContainer/load_key" to="." method="_on_load_key_pressed"]
+[connection signal="pressed" from="key_vault/HBoxContainer/crea key" to="." method="_on_crea_key_pressed"]

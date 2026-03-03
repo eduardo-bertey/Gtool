@@ -1,6 +1,4 @@
 extends Control
-var pkarr = preload("res://example_godot/examples-pkarr/pkarr.tscn")
-var key_nostr = preload("res://example_godot/examples-pkarr/key.tscn")
 var data = {}
 #const SAVE_DIR = "res://saves/"
 var platform
@@ -62,29 +60,6 @@ func dir_contents(path):
 
 
 
-
-
-
-
-func _on_pkarr_pressed() -> void:
-	#pkarr.instantiate()
-	#add_child(pkarr)
-	
-	var menu = preload("res://example_godot/examples-pkarr/pkarr.tscn").instantiate()
-	add_child(menu)
-	prints("instancio escena")
-	await get_tree().create_timer(3).timeout
-	pass # Replace with function body.
-
-
-
-func _on_key_nostr_pressed() -> void:
-	add_child(key_nostr.instantiate())
-	pass # Replace with function body.
-
-
-
-
 func load_data():
 	if $LineEdit.text == "":
 		prints("error no ingreso pass")
@@ -137,7 +112,7 @@ func save_data():
 	#pass 
 
 
-func _on_crear_pressed() -> void:
+func crear_pressed() -> void:
 	data = {
 		"empty" : "v.1.0.0",
 		"pin" : 3,

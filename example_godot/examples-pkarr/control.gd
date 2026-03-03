@@ -106,15 +106,17 @@ func _on_exit_pressed() -> void:
 
 
 func _on_crea_key_pressed() -> void:
-	keys = peer.key_rand()
+	#keys = peer.key_rand()
 	
-	$CodeEdit.text = peer.public_key(keys)
-	prints("creando key ", keys , "sizekey : " , keys.size())
+	$key_vault.crear_pressed()
+	#$CodeEdit.text = peer.public_key(keys)
+	#prints("creando key ", keys , "sizekey : " , keys.size())
 	pass # Replace with function body.
 
 
 func _on_save_key_pressed() -> void:
 	prints("aqui se guarda")
+	$key_vault.save_data()
 	pass # Replace with function body.
 
 
@@ -122,4 +124,10 @@ func _on_time_ttl_value_changed(value: float) -> void:
 	time_ttl = int(value)
 	$count_timer.text = str(value)
 	prints("cargo ttl : " , time_ttl)
+	pass # Replace with function body.
+
+
+func _on_load_key_pressed() -> void:
+	prints("aqui se carga")
+	$key_vault.load_data()
 	pass # Replace with function body.

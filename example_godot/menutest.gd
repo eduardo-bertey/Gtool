@@ -26,7 +26,7 @@ func _on_nostr_gift_pressed() -> void:
 
 
 func _on_button_pressed() -> void:
-	var data_exten = load("res://example_godot/examples-pkarr/main.tscn").instantiate()
+	var data_exten = load("res://example_godot/examples-pkarr/pkarr.tscn").instantiate()
 
 	self.add_child(data_exten)
 	

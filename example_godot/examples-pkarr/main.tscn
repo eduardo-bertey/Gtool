@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://c7iskwgu5aphr"]
+[gd_scene format=3 uid="uid://c7iskwgu5aphr"]
 
-[ext_resource type="Script" uid="uid://jyq8m6xvaq3t" path="res://example_godot/examples-pkarr/main.gd" id="1_tb2l5"]
+[ext_resource type="Script" uid="uid://dvw77om50iq3o" path="res://example_godot/examples-pkarr/main.gd" id="1_tb2l5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yylx1"]
 bg_color = Color(0.1882353, 0.007843138, 0.2, 1)
@@ -67,7 +67,16 @@ offset_right = 1084.0
 offset_bottom = 78.0
 text = "quit"
 
+[node name="load" type="Button" parent="." unique_id=1671628059]
+layout_mode = 0
+offset_left = 316.0
+offset_top = 92.0
+offset_right = 377.0
+offset_bottom = 135.0
+text = "load"
+
 [connection signal="pressed" from="GridContainer/key_nostr" to="." method="_on_key_nostr_pressed"]
 [connection signal="pressed" from="GridContainer/pkarr" to="." method="_on_pkarr_pressed"]
 [connection signal="pressed" from="crear" to="." method="_on_crear_pressed"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="load" to="." method="_on_load_pressed"]

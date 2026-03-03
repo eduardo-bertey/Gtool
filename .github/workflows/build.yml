@@ -76,7 +76,7 @@ jobs:
 
       - name: Build rust binary for android
         if: matrix.target == 'aarch64-linux-android'
-        run: cargo ndk -t ${{ matrix.target }} -p 34 build --release --verbose --locked
+        run: cargo ndk -t ${{ matrix.target }} --platform 34 build --release --verbose --locked
 
       - name: Rename binary to final_name
         shell: bash
