@@ -7,3 +7,4 @@
 *.apk
 export_presets.cfg
 *.idsig
+*.dll

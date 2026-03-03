@@ -1,15 +1,17 @@
 [gd_scene format=3 uid="uid://v0sked7wrod7"]
 
-[ext_resource type="Script" uid="uid://ss765ywvw8a4" path="res://example_godot/menutest.gd" id="1_kw2sm"]
+[ext_resource type="Script" uid="uid://dhg37742alye1" path="res://example_godot/menutest.gd" id="1_kw2sm"]
 [ext_resource type="PackedScene" uid="uid://bwlmqs4l40mxf" path="res://example_godot/exit.tscn" id="2_b4xnm"]
 
-[node name="menu" type="Control" unique_id=1146205673]
+[node name="menu" type="Control" unique_id=680400326]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_kw2sm")
 
 [node name="VBoxContainer" parent="." unique_id=658975175 instance=ExtResource("2_b4xnm")]

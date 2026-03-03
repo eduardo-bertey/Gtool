@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://chwmec8gh3b04"]
 
-[ext_resource type="Script" uid="uid://b8elavjpyi0u6" path="res://example_godot/notrngd/nostrn_prueba_observador.gd" id="1_06f07"]
-[ext_resource type="Script" uid="uid://bo7d7nxw0k3me" path="res://example_godot/notrngd/relayedit.gd" id="1_r2swp"]
-[ext_resource type="Script" uid="uid://dxawfe0crrmev" path="res://example_godot/notrngd/mostro_peer1.gd" id="2_06f07"]
-[ext_resource type="Script" uid="uid://bilhr4fe0jerh" path="res://example_godot/notrngd/mostro_peer2.gd" id="3_35dqd"]
-[ext_resource type="Script" uid="uid://c7dg43g6svpey" path="res://example_godot/notrngd/mostro_observer.gd" id="4_jf82l"]
+[ext_resource type="Script" uid="uid://cj2p48vbpx6gh" path="res://example_godot/notrngd/nostrn_prueba_observador.gd" id="1_06f07"]
+[ext_resource type="Script" uid="uid://bgk8dr1wlcf87" path="res://example_godot/notrngd/relayedit.gd" id="1_r2swp"]
+[ext_resource type="Script" uid="uid://brcd1exoqyt33" path="res://example_godot/notrngd/mostro_peer1.gd" id="2_06f07"]
+[ext_resource type="Script" uid="uid://bbx6xqmdhxiun" path="res://example_godot/notrngd/mostro_peer2.gd" id="3_35dqd"]
+[ext_resource type="Script" uid="uid://dvloyrh3drfyf" path="res://example_godot/notrngd/mostro_observer.gd" id="4_jf82l"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_i83a2"]
 content_margin_left = 0.0

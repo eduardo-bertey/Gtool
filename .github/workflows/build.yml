@@ -10,7 +10,7 @@ jobs:
   build:
     name: Build - ${{ matrix.target }}
     runs-on: ${{ matrix.runner }}
-    continue-on-error: true
+    continue-on-error: false
     defaults:
       run:
         working-directory: ./rust/rust
@@ -20,27 +20,27 @@ jobs:
           - runner: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             bin: libGtool.so
-            final_name: godot_gtool.so
+            final_name: Gtool.so
 
           - runner: windows-latest
             target: x86_64-pc-windows-msvc
             bin: Gtool.dll
-            final_name: godot_gtool.dll
+            final_name: Gtool.dll
 
           - runner: macos-latest
             target: x86_64-apple-darwin
             bin: libGtool.dylib
-            final_name: godot_gtool_x64.dylib
+            final_name: Gtool_x64.dylib
 
           - runner: macos-latest
             target: aarch64-apple-darwin
             bin: libGtool.dylib
-            final_name: godot_gtool_arm.dylib
+            final_name: Gtool_arm.dylib
 
           - runner: ubuntu-latest
             target: aarch64-linux-android
             bin: libGtool.so
-            final_name: libgodot_gtool_arm64.so
+            final_name: libGtool.so
 
     steps:
       - uses: actions/checkout@v4
@@ -76,15 +76,14 @@ jobs:
 
       - name: Build rust binary for android
         if: matrix.target == 'aarch64-linux-android'
-        run: cargo ndk -t ${{ matrix.target }} build --release --verbose
+        run: cargo ndk -t ${{ matrix.target }} -p 34 build --release --verbose --locked
 
       - name: Rename binary to final_name
         shell: bash
         run: |
           RELEASE_DIR="target/${{ matrix.target }}/release"
           if [ "${{ matrix.target }}" = "aarch64-linux-android" ]; then
-            ANDROID_SO=$(find "$RELEASE_DIR" -name "*.so" -type f | head -1)
-            mv "$ANDROID_SO" "$RELEASE_DIR/${{ matrix.final_name }}"
+            mv "$RELEASE_DIR/libGtool.so" "$RELEASE_DIR/${{ matrix.final_name }}"
           elif [ "${{ matrix.target }}" = "x86_64-pc-windows-msvc" ]; then
             mv "$RELEASE_DIR/Gtool.dll" "$RELEASE_DIR/${{ matrix.final_name }}"
           else
@@ -113,10 +112,10 @@ jobs:
           merge-multiple: true
 
       - name: Building a macOS universal lib
-        run: lipo -create -output addons/godot_gtool/godot_gtool.dylib addons/godot_gtool/godot_gtool_x64.dylib addons/godot_gtool/godot_gtool_arm.dylib
+        run: lipo -create -output addons/godot_gtool/Gtool.dylib addons/godot_gtool/Gtool_x64.dylib addons/godot_gtool/Gtool_arm.dylib
 
       - name: Remove individual macOS binaries
-        run: rm addons/godot_gtool/godot_gtool_x64.dylib addons/godot_gtool/godot_gtool_arm.dylib
+        run: rm addons/godot_gtool/Gtool_x64.dylib addons/godot_gtool/Gtool_arm.dylib
 
       - name: Copy license
         run: cp ../../LICENSE addons/godot_gtool/. || cp ../LICENSE addons/godot_gtool/. || true
