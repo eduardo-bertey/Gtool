@@ -53,6 +53,30 @@
 
 ---
 
+## Capturas de pantalla / Screenshots
+
+### Main Wiki / Vista Principal
+![Main](img/main.PNG)
+- **ES:** Vista principal con una descripción detallada de cada componente, similar a una mini wiki.
+- **EN:** Main view with a detailed description of each component, acting as a mini wiki.
+
+### Nostr Chat / Chat de Nostr
+![Nostr Chat](img/nostr%20chat.PNG)
+- **ES:** Interfaz para mensajería y chat mediante el protocolo Nostr.
+- **EN:** Interface for messaging and chat using the Nostr protocol.
+
+### Observer Mode / Modo Observador
+![Observer Chat](img/observer%20chat.PNG)
+- **ES:** Vista del modo observador para monitoreo y difusión.
+- **EN:** Observer mode view for monitoring and broadcasting.
+
+### Relay Management / Gestión de Relays
+![Relay Management](img/relay%20save%20and%20load.PNG)
+- **ES:** Sistema de carga y descarga de direcciones de relays Nostr.
+- **EN:** System for loading and saving Nostr relay addresses.
+
+---
+
 ## Ejemplos de uso / Usage Examples
 
 ### Cuckoo Filter

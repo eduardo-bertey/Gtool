@@ -1,7 +1,7 @@
 extends Node
 
 
-
+var true_val = []
 # prueba de 1048576 de hashes 
 # usa solo 2 megas de almacenamiento 
 # contra 32 megas de sha-256
@@ -17,27 +17,28 @@ func test_cuckoo_filter():
 	var filter = CuckooFilterGodot.new()
 	
 	# 2. Inicializar (capacidad 1048576, fingerprint 16 bits)
-	filter.init_filter(1048576, 16)
+	filter.init_filter(1500, 16)
 	print("Filtro inicializado.")
 
 	# 3. Generar y agregar 100 hashes
 	var hashes = []
-	for i in range(100):
+	for i in range(1500):
 		var data = PackedByteArray()
 		data.append_array(("dato_prueba_%d" % i).to_utf8_buffer())
 		var h = filter.generate_hash(data)
 		hashes.append(h)
 		filter.add(h)
 	
-	print("100 hashes agregados.")
+	print("1500 hashes agregados.")
 
-	# 4. Verificar que los 100 están presentes
-	var total_presentes = 0
-	for h in hashes:
-		if filter.contains(h):
-			total_presentes += 1
-	
-	print("Hashes verificados al inicio: %d/100" % total_presentes)
+	## 4. Verificar que los 100 están presentes
+	#var total_presentes = 0
+	#
+	#for h in hashes:
+		#if filter.contains(h):
+			#total_presentes += 1
+	#
+	#print("Hashes verificados al inicio: %d/100" % total_presentes)
 
 	# 5. Quitar 20 hashes
 	var removidos = []
@@ -86,18 +87,26 @@ func test_cuckoo_filter():
 
 	var errores = 0
 	var valid = 0
-	for i in range(1048576):
+	for i in range(1500):
 		var data = PackedByteArray()
 		data.append_array(("dato_prueba_%d" % i).to_utf8_buffer())
 		var h = filter.generate_hash(data)
 		if filter.contains(h):
-			if i > 100:
-				errores += 1
-			else:
+			#if i > 1500:
+				#errores += 1
+			#else:
 				valid += 1
+				true_val.append(true)
 		else:
 				errores += 1
-
+				true_val.append(false)
+	#prints(true_val)
+	$migrid.crear_cuadricula_rectangular(50, 30 , true_val)
 	print("Errores (Aleatorio mas de 100 ):" , errores)
 	print("Aciertos (antes de 100 mas de 20 ):" , valid)
 		#filter.add(h)
+
+
+func _on_quit_pressed() -> void:
+	self.queue_free()
+	pass # Replace with function body.

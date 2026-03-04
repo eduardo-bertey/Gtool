@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dhyr2ql40qnat"]
 
-[ext_resource type="Script" uid="uid://d3f4kayiwy3ve" path="res://example_godot/cuckoo/test_cuckoo.gd" id="1_2xum4"]
+[ext_resource type="Script" uid="uid://ben6nuiycvntj" path="res://example_godot/cuckoo/test_cuckoo.gd" id="1_2xum4"]
+[ext_resource type="Script" uid="uid://cv56j82yv5hbd" path="res://example_godot/cuckoo/test.gd" id="2_aov53"]
 
 [node name="cukoo" type="Control" unique_id=1745442462]
 layout_mode = 3
@@ -10,3 +11,42 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_2xum4")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1174721291]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.105882354, 0, 0.09411765, 1)
+
+[node name="Label" type="Label" parent="." unique_id=702056956]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 9.0
+offset_right = 1013.0
+offset_bottom = 73.0
+text = "20 false 1470 true "
+
+[node name="migrid" type="Control" parent="." unique_id=602097781]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 29.0
+offset_top = 68.0
+offset_right = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_aov53")
+
+[node name="quit" type="Button" parent="." unique_id=1577690249]
+layout_mode = 0
+offset_left = 1041.0
+offset_top = 9.0
+offset_right = 1112.0
+offset_bottom = 49.0
+text = "quit"
+
+[connection signal="pressed" from="quit" to="." method="_on_quit_pressed"]

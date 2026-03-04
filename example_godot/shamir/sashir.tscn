@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cdiwde2t4pcwx"]
 
-[ext_resource type="Script" uid="uid://tf3by80uyx3o" path="res://example_godot/shamir/test_shamir.gd" id="1_0m5e1"]
+[ext_resource type="Script" uid="uid://cao3gf4l31p3k" path="res://example_godot/shamir/test_shamir.gd" id="1_0m5e1"]
 
 [node name="sashir" type="Control" unique_id=1383961180]
 layout_mode = 3
@@ -10,3 +10,139 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0m5e1")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=412697729]
+layout_mode = 0
+offset_right = 1165.0
+offset_bottom = 353.0
+color = Color(0.4627451, 0.34509805, 0.4627451, 1)
+
+[node name="Control" type="Control" parent="." unique_id=495316373]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ColorRect2" type="ColorRect" parent="Control" unique_id=287045029]
+layout_mode = 0
+offset_top = 356.0
+offset_right = 1164.0
+offset_bottom = 648.0
+color = Color(0.5137255, 0.5294118, 0.6745098, 1)
+
+[node name="peer" type="ColorRect" parent="Control" unique_id=388470311]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 362.0
+offset_right = 92.0
+offset_bottom = 431.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Control/peer" unique_id=820518983]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 74.0
+offset_right = 400.0
+offset_bottom = 276.0
+
+[node name="peer3" type="ColorRect" parent="Control" unique_id=980518305]
+layout_mode = 0
+offset_left = 800.0
+offset_top = 361.0
+offset_right = 884.0
+offset_bottom = 430.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Control/peer3" unique_id=1139578192]
+layout_mode = 0
+offset_top = 80.0
+offset_right = 349.0
+offset_bottom = 286.0
+
+[node name="peer2" type="ColorRect" parent="Control" unique_id=1195963165]
+layout_mode = 0
+offset_left = 421.0
+offset_top = 362.0
+offset_right = 505.0
+offset_bottom = 431.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="Control/peer2" unique_id=1520413805]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 70.0
+offset_right = 348.0
+offset_bottom = 277.0
+
+[node name="Control" type="Control" parent="Control" unique_id=377584892]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ColorRect" type="ColorRect" parent="Control" unique_id=1380439756]
+layout_mode = 0
+offset_left = -7.0
+offset_top = 351.0
+offset_right = 1158.0
+offset_bottom = 354.0
+color = Color(0.52121156, 0.41223383, 0.6384234, 1)
+
+[node name="LineEdit" type="TextEdit" parent="." unique_id=617440155]
+layout_mode = 0
+offset_left = 218.0
+offset_top = 113.0
+offset_right = 598.0
+offset_bottom = 286.0
+text = "secreto de godot"
+placeholder_text = "max 64"
+
+[node name="LineEdit" type="LineEdit" parent="LineEdit" unique_id=1642748444]
+layout_mode = 0
+offset_left = -187.0
+offset_top = 3.0
+offset_right = -118.5
+offset_bottom = 34.0
+text = "4"
+alignment = 2
+
+[node name="Label" type="Label" parent="LineEdit/LineEdit" unique_id=1026222767]
+layout_mode = 1
+anchors_preset = -1
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = 42.0
+offset_right = 72.0
+offset_bottom = 49.5
+text = "part"
+
+[node name="LineEdit2" type="LineEdit" parent="LineEdit" unique_id=2049296048]
+layout_mode = 0
+offset_left = -187.0
+offset_top = 110.0
+offset_right = -118.5
+offset_bottom = 141.0
+text = "3"
+
+[node name="Label" type="Label" parent="LineEdit/LineEdit2" unique_id=843942603]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 43.0
+offset_right = 61.0
+offset_bottom = 71.0
+text = "threshold"
+
+[node name="send" type="Button" parent="." unique_id=698093851]
+layout_mode = 0
+offset_left = 161.0
+offset_top = 41.0
+offset_right = 432.0
+offset_bottom = 79.0
+text = "send"
+
+[node name="quit" type="Button" parent="." unique_id=448971324]
+layout_mode = 0
+offset_right = 117.0
+offset_bottom = 59.0
+text = "exit"
+
+[connection signal="pressed" from="send" to="." method="_on_send_pressed"]
+[connection signal="pressed" from="quit" to="." method="_on_quit_pressed"]

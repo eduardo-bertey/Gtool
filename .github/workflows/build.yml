@@ -15,6 +15,7 @@ jobs:
       run:
         working-directory: ./rust/rust
     strategy:
+      fail-fast: false
       matrix:
         include:
           - runner: ubuntu-latest
@@ -81,13 +82,21 @@ jobs:
       - name: Rename binary to final_name
         shell: bash
         run: |
-          RELEASE_DIR="target/${{ matrix.target }}/release"
+          SRC_FILE=""
           if [ "${{ matrix.target }}" = "aarch64-linux-android" ]; then
-            mv "$RELEASE_DIR/libGtool.so" "$RELEASE_DIR/${{ matrix.final_name }}"
+            SRC_FILE="$RELEASE_DIR/libGtool.so"
           elif [ "${{ matrix.target }}" = "x86_64-pc-windows-msvc" ]; then
-            mv "$RELEASE_DIR/Gtool.dll" "$RELEASE_DIR/${{ matrix.final_name }}"
+            SRC_FILE="$RELEASE_DIR/Gtool.dll"
           else
-            mv "$RELEASE_DIR/${{ matrix.bin }}" "$RELEASE_DIR/${{ matrix.final_name }}"
+            SRC_FILE="$RELEASE_DIR/${{ matrix.bin }}"
+          fi
+
+          DEST_FILE="$RELEASE_DIR/${{ matrix.final_name }}"
+
+          if [ "$SRC_FILE" != "$DEST_FILE" ]; then
+            mv "$SRC_FILE" "$DEST_FILE"
+          else
+            echo "Skipping rename: source and destination are the same ($SRC_FILE)"
           fi
 
       - name: Upload rust binary artifact

@@ -50,3 +50,21 @@ func _on_nostronger_pressed() -> void:
 	
 	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
 	pass # Replace with function body.
+
+
+func _on_shamir_pressed() -> void:
+	var data_exten = load("res://example_godot/shamir/sashir.tscn").instantiate()
+
+	self.add_child(data_exten)
+	
+	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
+
+
+func _on_cukoo_pressed() -> void:
+	var data_exten = load("res://example_godot/cuckoo/cukoo.tscn").instantiate()
+
+	self.add_child(data_exten)
+	
+	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
+
+	pass # Replace with function body.

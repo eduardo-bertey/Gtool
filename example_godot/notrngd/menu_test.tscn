@@ -2,6 +2,13 @@
 
 [ext_resource type="Script" uid="uid://dhg37742alye1" path="res://example_godot/menutest.gd" id="1_kw2sm"]
 [ext_resource type="PackedScene" uid="uid://bwlmqs4l40mxf" path="res://example_godot/exit.tscn" id="2_b4xnm"]
+[ext_resource type="Script" uid="uid://cut3h2hvatunb" path="res://example_godot/notrngd/nostr_gift.gd" id="3_5vvlr"]
+[ext_resource type="Script" uid="uid://c72ls80r7imbb" path="res://example_godot/notrngd/nostr_observer.gd" id="4_iysho"]
+[ext_resource type="Script" uid="uid://dcc17fpvw56b1" path="res://example_godot/notrngd/pkarr.gd" id="5_otp6s"]
+[ext_resource type="Script" uid="uid://hh05maudqtm5" path="res://example_godot/notrngd/key.gd" id="6_jiddj"]
+[ext_resource type="Script" uid="uid://ddpcmpiqap35y" path="res://example_godot/notrngd/nostronger.gd" id="7_nh302"]
+[ext_resource type="Script" uid="uid://dn0iqmjagqqtw" path="res://example_godot/notrngd/shamir.gd" id="8_u71j4"]
+[ext_resource type="Script" uid="uid://dx3losg76al1m" path="res://example_godot/notrngd/cukoo.gd" id="9_hh8st"]
 
 [node name="menu" type="Control" unique_id=680400326]
 layout_mode = 3
@@ -34,35 +41,76 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -94.0
-offset_top = -33.0
-offset_right = 94.0
-offset_bottom = 33.0
+offset_left = -533.0
+offset_top = -275.0
+offset_right = -345.0
+offset_bottom = -19.5
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="nostr gift" type="Button" parent="TabContainer" unique_id=810387184]
 layout_mode = 2
 text = "nostr gift"
+script = ExtResource("3_5vvlr")
 
 [node name="nostr_observer" type="Button" parent="TabContainer" unique_id=1291688190]
 layout_mode = 2
 text = "test with observed"
+script = ExtResource("4_iysho")
 
 [node name="pkarr" type="Button" parent="TabContainer" unique_id=439401269]
 layout_mode = 2
 text = "pkarr"
+script = ExtResource("5_otp6s")
 
 [node name="key" type="Button" parent="TabContainer" unique_id=214177876]
 layout_mode = 2
 text = "key nostr"
+script = ExtResource("6_jiddj")
 
 [node name="nostronger" type="Button" parent="TabContainer" unique_id=1301472206]
 layout_mode = 2
 text = "nostringer"
+script = ExtResource("7_nh302")
 
+[node name="shamir" type="Button" parent="TabContainer" unique_id=1801677989]
+layout_mode = 2
+text = "shamir"
+script = ExtResource("8_u71j4")
+
+[node name="cukoo" type="Button" parent="TabContainer" unique_id=1441303761]
+layout_mode = 2
+text = "cukoo hash"
+script = ExtResource("9_hh8st")
+
+[node name="TextEdit" type="TextEdit" parent="." unique_id=1028781057]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 60.0
+offset_right = 1118.0
+offset_bottom = 625.0
+editable = false
+context_menu_enabled = false
+emoji_menu_enabled = false
+backspace_deletes_composite_character_enabled = true
+wrap_mode = 1
+indent_wrapped_lines = true
+tab_input_mode = false
+
+[connection signal="mouse_entered" from="TabContainer/nostr gift" to="TabContainer/nostr gift" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="TabContainer/nostr gift" to="TabContainer/nostr gift" method="_on_mouse_exited"]
 [connection signal="pressed" from="TabContainer/nostr gift" to="." method="_on_nostr_gift_pressed"]
+[connection signal="mouse_entered" from="TabContainer/nostr_observer" to="TabContainer/nostr_observer" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="TabContainer/nostr_observer" to="TabContainer/nostr_observer" method="_on_mouse_exited"]
 [connection signal="pressed" from="TabContainer/nostr_observer" to="." method="_on_nostr_pressed"]
+[connection signal="mouse_entered" from="TabContainer/pkarr" to="TabContainer/pkarr" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="TabContainer/pkarr" to="TabContainer/pkarr" method="_on_mouse_exited"]
 [connection signal="pressed" from="TabContainer/pkarr" to="." method="_on_button_pressed"]
+[connection signal="mouse_entered" from="TabContainer/key" to="TabContainer/key" method="_on_mouse_entered"]
 [connection signal="pressed" from="TabContainer/key" to="." method="_on_key_pressed"]
+[connection signal="mouse_entered" from="TabContainer/nostronger" to="TabContainer/nostronger" method="_on_mouse_entered"]
 [connection signal="pressed" from="TabContainer/nostronger" to="." method="_on_nostronger_pressed"]
+[connection signal="mouse_entered" from="TabContainer/shamir" to="TabContainer/shamir" method="_on_mouse_entered"]
+[connection signal="pressed" from="TabContainer/shamir" to="." method="_on_shamir_pressed"]
+[connection signal="mouse_entered" from="TabContainer/cukoo" to="TabContainer/cukoo" method="_on_mouse_entered"]
+[connection signal="pressed" from="TabContainer/cukoo" to="." method="_on_cukoo_pressed"]
