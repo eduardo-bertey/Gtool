@@ -9,6 +9,7 @@ unsafe impl ExtensionLibrary for RustExtension {}
 
 
 
+mod ntny;
 //mod player;
 mod peerinfo;
 mod state;

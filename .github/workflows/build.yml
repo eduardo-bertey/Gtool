@@ -82,21 +82,41 @@ jobs:
       - name: Rename binary to final_name
         shell: bash
         run: |
-          SRC_FILE=""
+          RELEASE_DIR="target/${{ matrix.target }}/release"
           if [ "${{ matrix.target }}" = "aarch64-linux-android" ]; then
             SRC_FILE="$RELEASE_DIR/libGtool.so"
           elif [ "${{ matrix.target }}" = "x86_64-pc-windows-msvc" ]; then
             SRC_FILE="$RELEASE_DIR/Gtool.dll"
+          elif [ "${{ matrix.target }}" = "x86_64-unknown-linux-gnu" ]; then
+            SRC_FILE="$RELEASE_DIR/libGtool.so"
           else
             SRC_FILE="$RELEASE_DIR/${{ matrix.bin }}"
           fi
 
           DEST_FILE="$RELEASE_DIR/${{ matrix.final_name }}"
 
-          if [ "$SRC_FILE" != "$DEST_FILE" ]; then
-            mv "$SRC_FILE" "$DEST_FILE"
+          echo "Checking for source file: $SRC_FILE"
+          if [ ! -f "$SRC_FILE" ]; then
+            echo "Searching for binary in $RELEASE_DIR..."
+            ls -R "$RELEASE_DIR"
+            # Fallback if the path is slightly different
+            ACTUAL_FILE=$(find "$RELEASE_DIR" -name "${{ matrix.bin }}" | head -n 1)
+            if [ -n "$ACTUAL_FILE" ]; then
+              SRC_FILE="$ACTUAL_FILE"
+              echo "Found file at: $SRC_FILE"
+            fi
+          fi
+
+          if [ -f "$SRC_FILE" ]; then
+            if [ "$SRC_FILE" != "$DEST_FILE" ]; then
+              mv "$SRC_FILE" "$DEST_FILE"
+              echo "Moved $SRC_FILE to $DEST_FILE"
+            else
+              echo "Skipping rename: source and destination are the same ($SRC_FILE)"
+            fi
           else
-            echo "Skipping rename: source and destination are the same ($SRC_FILE)"
+            echo "ERROR: Source file $SRC_FILE not found!"
+            exit 1
           fi
 
       - name: Upload rust binary artifact
