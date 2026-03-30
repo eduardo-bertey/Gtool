@@ -49,4 +49,21 @@ offset_right = 1112.0
 offset_bottom = 49.0
 text = "quit"
 
+[node name="rand quit" type="Button" parent="." unique_id=661280341]
+layout_mode = 0
+offset_left = 430.0
+offset_top = 12.0
+offset_right = 574.0
+offset_bottom = 34.0
+text = "rand quit"
+
+[node name="Label2" type="Label" parent="." unique_id=1965820123]
+layout_mode = 0
+offset_left = 574.0
+offset_top = 16.0
+offset_right = 649.0
+offset_bottom = 39.0
+text = "repetido :0 clicks :  0"
+
 [connection signal="pressed" from="quit" to="." method="_on_quit_pressed"]
+[connection signal="pressed" from="rand quit" to="." method="_on_rand_quit_pressed"]

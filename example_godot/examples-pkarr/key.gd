@@ -17,7 +17,7 @@ func is_valid(s: String) -> bool:
 	return true
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	#count += 1
 	$buscar/LineEdit/count.text = str(count)
 	

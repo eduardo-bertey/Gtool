@@ -7,7 +7,7 @@ func _ready():
 	# Parámetros: 
 	# path (res:// o ruta absoluta), seed (GString), overwrite (bool), run (bool)
 	
-	var script_path = "res://pepito.gd"
+	var script_path = "res://pepito.key"
 	#var global_path = "C:/ejemplo_gigante.txt"
 	var my_seed = "mi_clave_secreta_123"
 	

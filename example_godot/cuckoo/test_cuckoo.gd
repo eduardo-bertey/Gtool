@@ -5,8 +5,11 @@ var true_val = []
 # prueba de 1048576 de hashes 
 # usa solo 2 megas de almacenamiento 
 # contra 32 megas de sha-256
-
-
+var h = []
+var hashes = []
+var filter = CuckooFilterGodot.new()
+var repeat = 0
+var click = 0
 func _ready():
 	test_cuckoo_filter()
 
@@ -14,14 +17,14 @@ func test_cuckoo_filter():
 	print("--- Iniciando Test de Cuckoo Filter ---")
 	
 	# 1. Crear instancia
-	var filter = CuckooFilterGodot.new()
+	filter = CuckooFilterGodot.new()
 	
 	# 2. Inicializar (capacidad 1048576, fingerprint 16 bits)
 	filter.init_filter(1500, 16)
 	print("Filtro inicializado.")
 
 	# 3. Generar y agregar 100 hashes
-	var hashes = []
+	
 	for i in range(1500):
 		var data = PackedByteArray()
 		data.append_array(("dato_prueba_%d" % i).to_utf8_buffer())
@@ -90,7 +93,7 @@ func test_cuckoo_filter():
 	for i in range(1500):
 		var data = PackedByteArray()
 		data.append_array(("dato_prueba_%d" % i).to_utf8_buffer())
-		var h = filter.generate_hash(data)
+		h = filter.generate_hash(data)
 		if filter.contains(h):
 			#if i > 1500:
 				#errores += 1
@@ -104,9 +107,44 @@ func test_cuckoo_filter():
 	$migrid.crear_cuadricula_rectangular(50, 30 , true_val)
 	print("Errores (Aleatorio mas de 100 ):" , errores)
 	print("Aciertos (antes de 100 mas de 20 ):" , valid)
+	$Label.text = str(errores) + " false " + str(valid) + " valid "
 		#filter.add(h)
 
 
 func _on_quit_pressed() -> void:
 	self.queue_free()
+	pass # Replace with function body.
+
+
+func _on_rand_quit_pressed() -> void:
+	click += 1 
+	var quit = int(randi_range(0 , 1499))
+	filter.remove(hashes[quit])
+	if true_val[quit]== false:
+		prints("esta borrado")
+		repeat += 1
+	$Label2.text = "repetido :" + str(repeat) + " clicks : "+ str(click)
+		
+	prints("quito : ", quit)
+	#var true_val = []
+	var errores = 0
+	var valid = 0
+	for i in range(1500):
+		var data = PackedByteArray()
+		data.append_array(("dato_prueba_%d" % i).to_utf8_buffer())
+		h = filter.generate_hash(data)
+		if filter.contains(h):
+			#if i > 1500:
+				#errores += 1
+			#else:
+				valid += 1
+				true_val[i]=true
+		else:
+				errores += 1
+				true_val[i]=false
+	#prints(true_val)
+	$migrid.crear_cuadricula_rectangular(50, 30 , true_val)
+	print("Errores (Aleatorio mas de 100 ):" , errores)
+	print("Aciertos (antes de 100 mas de 20 ):" , valid)
+	$Label.text = str(errores) + " false " + str(valid) + " valid "
 	pass # Replace with function body.

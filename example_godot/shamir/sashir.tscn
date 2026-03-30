@@ -121,6 +121,7 @@ offset_top = 110.0
 offset_right = -118.5
 offset_bottom = 141.0
 text = "3"
+alignment = 2
 
 [node name="Label" type="Label" parent="LineEdit/LineEdit2" unique_id=843942603]
 layout_mode = 0
@@ -132,10 +133,10 @@ text = "threshold"
 
 [node name="send" type="Button" parent="." unique_id=698093851]
 layout_mode = 0
-offset_left = 161.0
-offset_top = 41.0
-offset_right = 432.0
-offset_bottom = 79.0
+offset_left = 218.0
+offset_top = 56.0
+offset_right = 489.0
+offset_bottom = 94.0
 text = "send"
 
 [node name="quit" type="Button" parent="." unique_id=448971324]

@@ -4,18 +4,21 @@ extends Control
 var columnas : int = 50  # Ancho (X)
 var filas : int = 30     # Alto (Y)
 var tamaño_pixel : int = 15 
-
+var grid = GridContainer.new()
 # Nuestra matriz (Array de Arrays)
 var matriz_nodos : Array = []
 var valid : Array = []
-func grid():
+func grids():
 	crear_cuadricula_rectangular(columnas, filas , valid)
 
 func crear_cuadricula_rectangular(ancho: int, alto: int , true_val):
 	matriz_nodos.clear()
+	grid.queue_free()
+
+	
 	
 	# Usamos un GridContainer para que acomode los 1500 cuadros
-	var grid = GridContainer.new()
+	grid = GridContainer.new()
 	grid.columns = ancho  # Seteamos el ancho de la cuadrícula
 	add_child(grid)
 	var count = 0

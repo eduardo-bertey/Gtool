@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dpnwyldkd0x26"]
+
+[ext_resource type="Script" uid="uid://bu8qa78x1lmdq" path="res://example_godot/yatorrent/example_info.gd" id="1_0tiqh"]
+
+[node name="Yatorrent_tscn" type="Node" unique_id=1968014074]
+script = ExtResource("1_0tiqh")

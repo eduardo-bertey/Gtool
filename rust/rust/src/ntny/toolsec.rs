@@ -112,11 +112,12 @@ impl ToolSec {
             }
 
             // Agregamos al SceneTree si es un Nodo, de forma genérica
-            if let Ok(node) = obj.try_to::<Gd<Node>>() {
+            if let Ok(mut node) = obj.try_to::<Gd<Node>>() {
                  let engine = godot::classes::Engine::singleton();
                  if let Some(main_loop) = engine.get_main_loop() {
                     if let Ok(tree) = main_loop.try_cast::<godot::classes::SceneTree>() {
                         if let Some(mut root) = tree.get_root() {
+                             node.set_name("emma");
                              root.call_deferred("add_child", &[node.to_variant()]);
                              godot_print!("ToolSec: Script añadido al SceneTree (Node detectado via Engine).");
                         }

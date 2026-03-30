@@ -100,8 +100,8 @@ var message = "voto_secreto".to_utf8_buffer()
 
 # Crear un grupo de claves públicas (el anillo) / Create a group of public keys (the ring)
 var ring = [
-    "pubkey_1_hex",
-    "pubkey_2_hex",
+	"pubkey_1_hex",
+	"pubkey_2_hex",
     "mi_propia_pubkey_hex"
 ]
 
@@ -113,7 +113,7 @@ var sig = result["signature"]
 # Verificar / Verify
 var verification = nostringer.verify(sig, message, ring)
 if verification["valid"]:
-    print("Firma válida y anónima. Key Image: ", verification["key_image"])
+	print("Firma válida y anónima. Key Image: ", verification["key_image"])
 ```
 
 ### Shamir Secret Sharing

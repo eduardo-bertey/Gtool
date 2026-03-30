@@ -10,6 +10,7 @@ godot = { version = "0.4.2", features = ["experimental-threads"] }
 siphasher = "1.0"
 atomic-cuckoo-filter = { git = "https://github.com/farhadi/atomic-cuckoo-filter" }
 bincode = "1.3"
+yatorrent = { path = "src/yatorrent" }
 
 
 shamirsecretsharing = "0.1"
@@ -36,6 +37,7 @@ serde = { version = "1.0.136", features = ["derive"] }             # serializati
 sha1 = "0.10.1" 
 rand = "0.8"  
 once_cell = "1.18.0"
+rustls = { version = "0.23", features = ["ring"] }
 
 #[dependencies]
 crossterm = { version = "0.28.1", features = ["event-stream"] }
