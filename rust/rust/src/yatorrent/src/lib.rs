@@ -1,9 +1,3 @@
 pub mod bencoding;
-pub mod dht;
-pub mod magnet;
-pub mod manager;
 pub mod metadata;
-pub mod persistence;
-pub mod torrent_protocol;
-pub mod tracker;
 pub mod util;

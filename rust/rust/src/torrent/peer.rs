@@ -50,7 +50,7 @@ pub fn print_peers(bytes: &[u8]) {
         peer_id,
         length
     );
-    GLOBAL_HTTP.lock().unwrap().push(tracker_url.to_string() + "  " + &announce.to_string());
+    GLOBAL_HTTP.lock().unwrap().push(format!("{}  {}", tracker_url, announce));
     let response = reqwest::blocking::get(&tracker_url)
         .expect("Tracker request failed")
         .bytes()
@@ -65,7 +65,7 @@ pub fn print_peers(bytes: &[u8]) {
 
         let ip = format!("{}.{}.{}.{}", chunk[0], chunk[1], chunk[2], chunk[3]);
         let port = u16::from_be_bytes([chunk[4], chunk[5]]);
-        GLOBAL_IPS.lock().unwrap().push(ip.to_string() + ":" + &port.to_string());
+        GLOBAL_IPS.lock().unwrap().push(format!("{}:{}", ip, port));
         
         println!("{}:{}", ip, port);
     }

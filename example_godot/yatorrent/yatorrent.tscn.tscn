@@ -1,6 +1,29 @@
 [gd_scene format=3 uid="uid://dpnwyldkd0x26"]
 
-[ext_resource type="Script" uid="uid://bu8qa78x1lmdq" path="res://example_godot/yatorrent/example_info.gd" id="1_0tiqh"]
+[ext_resource type="Script" uid="uid://dx1obw1eygsdi" path="res://example_godot/yatorrent/example_info.gd" id="1_0tiqh"]
 
 [node name="Yatorrent_tscn" type="Node" unique_id=1968014074]
 script = ExtResource("1_0tiqh")
+
+[node name="Button" type="Button" parent="." unique_id=476293348]
+offset_right = 252.0
+offset_bottom = 96.0
+text = "info"
+
+[node name="uri" type="Button" parent="." unique_id=940184126]
+offset_left = -1.0
+offset_top = 135.0
+offset_right = 226.0
+offset_bottom = 243.0
+text = "uri"
+
+[node name="torrent" type="Button" parent="." unique_id=2116412786]
+offset_left = 293.0
+offset_top = 135.0
+offset_right = 543.0
+offset_bottom = 242.0
+text = "torrent"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="uri" to="." method="_on_uri_pressed"]
+[connection signal="pressed" from="torrent" to="." method="_on_torrent_pressed"]

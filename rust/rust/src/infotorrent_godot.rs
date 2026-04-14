@@ -1,9 +1,20 @@
 use godot::prelude::*;
 use yatorrent::metadata::metainfo::Metainfo;
 use yatorrent::bencoding::Value;
-use yatorrent::manager::torrent_manager::TorrentManager;
-use tokio::sync::mpsc;
 use std::fs;
+use std::sync::Arc;
+use once_cell::sync::Lazy;
+
+static RUNTIME: Lazy<tokio::runtime::Runtime> = Lazy::new(|| {
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("Failed to create Tokio runtime")
+});
+
+
+use std::sync::Mutex;
+
 
 #[derive(GodotClass)]
 #[class(base=RefCounted)]
@@ -12,8 +23,18 @@ pub struct InfoTorrent {
     metainfo: Option<Metainfo>,
     info_hash: Option<[u8; 20]>,
     announce_list: Vec<Vec<String>>,
-    dht_nodes: Vec<String>,
+    display_name: String,
+    hash_type: String,
+    exact_length: Option<u64>,
+    web_seed: String,
+    source: String,
+    search_keywords: String,
+    acceptable_source: String,
+    manifest: String,
+    fetched_data: Arc<Mutex<Option<Vec<u8>>>>,
 }
+
+// Signals are now part of the main impl block below
 
 #[godot_api]
 impl IRefCounted for InfoTorrent {
@@ -23,11 +44,15 @@ impl IRefCounted for InfoTorrent {
             metainfo: None,
             info_hash: None,
             announce_list: Vec::new(),
-            dht_nodes: vec![
-                "router.bittorrent.com:6881".to_string(),
-                "router.utorrent.com:6881".to_string(),
-                "dht.transmissionbt.com:6881".to_string(),
-            ],
+            display_name: String::new(),
+            hash_type: String::new(),
+            exact_length: None,
+            web_seed: String::new(),
+            source: String::new(),
+            search_keywords: String::new(),
+            acceptable_source: String::new(),
+            manifest: String::new(),
+            fetched_data: Arc::new(Mutex::new(None)),
         }
     }
 }
@@ -36,6 +61,77 @@ impl IRefCounted for InfoTorrent {
 impl InfoTorrent {
     #[signal]
     fn metadata_loaded();
+
+    #[func]
+    pub fn load_from_magnet(&mut self, uri: GString) -> bool {
+        let uri_str = uri.to_string();
+        
+        self.info_hash = None;
+        self.metainfo = None;
+        self.display_name = String::new();
+        self.announce_list = Vec::new();
+        self.exact_length = None;
+        self.hash_type = String::new();
+
+        if uri_str.len() == 40 && uri_str.chars().all(|c| c.is_ascii_hexdigit()) {
+            if let Ok(hash_vec) = hex::decode(&uri_str) {
+                if let Ok(hash_array) = hash_vec.try_into() {
+                    self.info_hash = Some(hash_array);
+                    self.hash_type = "btih".to_string();
+                    return true;
+                }
+            }
+        }
+
+        if !uri_str.starts_with("magnet:?") { return false; }
+        
+        let params = &uri_str[8..];
+        for part in params.split('&') {
+            let kv: Vec<&str> = part.splitn(2, '=').collect();
+            if kv.len() == 2 {
+                let (k, v) = (kv[0], kv[1]);
+                match k {
+                    "xt" => {
+                        if v.contains("btih:") {
+                            let hex_str = v.split(':').last().unwrap_or("");
+                            if let Ok(hash_vec) = hex::decode(hex_str) {
+                                if let Ok(hash_array) = hash_vec.try_into() {
+                                    self.info_hash = Some(hash_array);
+                                    self.hash_type = "btih".to_string();
+                                }
+                            }
+                        }
+                    }
+                    "dn" => self.display_name = v.replace("%20", " ").replace("+", " "),
+                    "tr" => {
+                        let decoded = v.replace("%3A", ":").replace("%2F", "/").replace("%3F", "?").replace("%3D", "=");
+                        self.announce_list.push(vec![decoded]);
+                    }
+                    "xl" => self.exact_length = v.parse::<u64>().ok(),
+                    "ws" => self.web_seed = v.to_string(),
+                    "as" => self.acceptable_source = v.to_string(),
+                    "xs" => self.source = v.to_string(),
+                    "kt" => self.search_keywords = v.replace("+", " "),
+                    "mt" => self.manifest = v.to_string(),
+                    _ => {}
+                }
+            }
+        }
+        self.info_hash.is_some()
+    }
+
+    #[func]
+    pub fn add_tracker(&mut self, url: GString) {
+        self.announce_list.push(vec![url.to_string()]);
+    }
+
+    #[func]
+    pub fn set_trackers(&mut self, urls: PackedStringArray) {
+        self.announce_list.clear();
+        for url in urls.as_slice() {
+            self.announce_list.push(vec![url.to_string()]);
+        }
+    }
 
     #[func]
     pub fn load_from_file(&mut self, path: GString) -> bool {
@@ -51,7 +147,11 @@ impl InfoTorrent {
         match Metainfo::new(&torrent_content, &contents) {
             Ok(m) => {
                 self.info_hash = Some(m.info_hash);
-                self.announce_list = m.announce_list.clone(); // Clone before move
+                self.announce_list = m.announce_list.clone();
+                match &m.file {
+                    yatorrent::metadata::infodict::MetainfoFile::SingleFile(f) => self.display_name = f.name.clone(),
+                    yatorrent::metadata::infodict::MetainfoFile::MultiFile(f) => self.display_name = f.name.clone(),
+                }
                 self.metainfo = Some(m);
                 true
             }
@@ -60,147 +160,6 @@ impl InfoTorrent {
                 false
             }
         }
-    }
-
-    #[func]
-    pub fn load_from_magnet(&mut self, uri: GString) -> bool {
-        let uri_str = uri.to_string();
-        
-        // Intentar parsear como un hash hexadecimal directamente (40 caracteres)
-        if uri_str.len() == 40 {
-             if let Ok(hash_vec) = hex::decode(&uri_str) {
-                 if let Ok(hash_array) = hash_vec.try_into() {
-                     self.info_hash = Some(hash_array);
-                     self.metainfo = None; 
-                     return true;
-                 }
-             }
-        }
-
-        // Intentar parsear como magnet URI completo
-        match yatorrent::magnet::Magnet::new(uri_str) {
-            Ok(magnet) => {
-                self.info_hash = Some(magnet.info_hash);
-                self.metainfo = None; 
-                self.announce_list = vec![magnet.tracker_urls];
-                true
-            }
-            Err(e) => {
-                godot_error!("Could not parse magnet/infohash: {}", e);
-                false
-            }
-        }
-    }
-
-    #[func]
-    pub fn fetch_metadata(&mut self) {
-        let info_hash = match self.info_hash {
-             Some(h) => h,
-             None => {
-                 godot_error!("No info hash set. Call load_from_tracker or load_from_magnet first.");
-                 return;
-             }
-        };
-
-        let announce_list = self.announce_list.clone();
-        let dht_nodes = self.dht_nodes.clone();
-        
-        // El InstanceId es seguro para hilos (Send/Sync), a diferencia del objeto Gd o Callable.
-        let instance_id = self.base().instance_id();
-        
-        std::thread::spawn(move || {
-            let rt = match tokio::runtime::Builder::new_current_thread()
-                .enable_all()
-                .build() {
-                Ok(rt) => rt,
-                Err(e) => {
-                    godot_error!("Could not create tokio runtime: {}", e);
-                    return;
-                }
-            };
-
-            rt.block_on(async move {
-                let temp_dir = std::env::temp_dir();
-                let (tx, mut rx) = mpsc::unbounded_channel::<Vec<u8>>();
-                
-                let mut manager = TorrentManager::new(
-                    info_hash,
-                    &temp_dir,
-                    6881,
-                    announce_list,
-                    None,
-                    None,
-                    6882,
-                    dht_nodes,
-                    Vec::new(),
-                    true, // stop after metadata download
-                    10,
-                );
-                
-                manager.metadata_tx = Some(tx);
-
-                // Ejecutamos el manager y escuchamos el canal en paralelo
-                // SIN usar tokio::spawn para evitar errores de MutexGuard (!Send)
-                tokio::select! {
-                    _ = manager.start() => {},
-                    Some(data) = rx.recv() => {
-                        let bytes = PackedByteArray::from_iter(data);
-                        // Recuperamos la instancia de forma segura y avisamos a Godot
-                        let mut gd_instance = Gd::<InfoTorrent>::from_instance_id(instance_id);
-                        gd_instance.call_deferred("emit_metadata_loaded_internal", &[bytes.to_variant()]);
-                    }
-                }
-            });
-        });
-    }
-
-    #[func]
-    fn emit_metadata_loaded_internal(&mut self, metadata_bytes: PackedByteArray) {
-        let bytes = metadata_bytes.to_vec();
-        let torrent_content = Value::new(&bytes);
-        match Metainfo::new(&torrent_content, &bytes) {
-             Ok(m) => {
-                 self.metainfo = Some(m);
-                 // Corregido: sin .into() para evitar error E0283
-                 self.base_mut().emit_signal("metadata_loaded", &[]);
-             }
-             Err(e) => {
-                 godot_error!("Error al parsear metadata: {}", e);
-             }
-        }
-    }
-
-    #[func]
-    pub fn get_files(&self) -> Array<VarDictionary> {
-        let mut arr = Array::new();
-        if let Some(m) = &self.metainfo {
-            let piece_length = m.piece_length;
-            let mut current_offset: u64 = 0;
-            
-            for (file_path, length) in m.get_files() {
-                let start_offset = current_offset;
-                let end_offset = current_offset + length;
-                
-                let start_piece = start_offset / piece_length;
-                let end_piece = if length > 0 {
-                    (end_offset - 1) / piece_length
-                } else {
-                    start_piece
-                };
-                
-                let mut d = VarDictionary::new();
-                d.insert("path", GString::from(&file_path));
-                d.insert("size", length);
-                d.insert("start_offset", start_offset);
-                d.insert("end_offset", end_offset);
-                d.insert("start_piece", start_piece as i64);
-                d.insert("end_piece", end_piece as i64);
-                
-                arr.push(&d);
-                current_offset += length;
-            }
-        }
-        arr
     }
 
     #[func]
@@ -216,20 +175,12 @@ impl InfoTorrent {
 
     #[func]
     pub fn get_piece_length(&self) -> u64 {
-        if let Some(m) = &self.metainfo {
-            m.piece_length
-        } else {
-            0
-        }
+        if let Some(m) = &self.metainfo { m.piece_length } else { 0 }
     }
 
     #[func]
     pub fn get_piece_count(&self) -> i32 {
-        if let Some(m) = &self.metainfo {
-            m.pieces.len() as i32
-        } else {
-            0
-        }
+        if let Some(m) = &self.metainfo { m.pieces.len() as i32 } else { 0 }
     }
 
     #[func]
@@ -250,12 +201,166 @@ impl InfoTorrent {
         if let Some(m) = &self.metainfo {
              m.get_files().iter().map(|f| f.1).sum()
         } else {
-            0
+            self.exact_length.unwrap_or(0)
         }
     }
-    
+
     #[func]
-    pub fn is_loaded(&self) -> bool {
-        self.metainfo.is_some()
+    pub fn get_files(&self) -> Array<VarDictionary> {
+        let mut arr = Array::new();
+        if let Some(m) = &self.metainfo {
+            let piece_length = m.piece_length;
+            let mut current_offset: u64 = 0;
+            for (file_path, length) in m.get_files() {
+                let start_offset = current_offset;
+                let end_offset = current_offset + length;
+                let start_piece = start_offset / piece_length;
+                let end_piece = if length > 0 { (end_offset - 1) / piece_length } else { start_piece };
+                
+                let mut d = VarDictionary::new();
+                d.insert("path", GString::from(&file_path));
+                d.insert("size", length);
+                d.insert("start_offset", start_offset);
+                d.insert("end_offset", end_offset);
+                d.insert("start_piece", start_piece as i64);
+                d.insert("end_piece", end_piece as i64);
+                arr.push(&d);
+                current_offset += length;
+            }
+        }
+        arr
+    }
+
+    #[func] pub fn get_display_name(&self) -> GString { GString::from(&self.display_name) }
+    #[func] pub fn get_trackers(&self) -> Array<Variant> {
+        let mut outer = Array::new();
+        for tier in &self.announce_list {
+            let mut inner = Array::<GString>::new();
+            for tracker in tier { inner.push(&GString::from(tracker)); }
+            outer.push(&inner.to_variant());
+        }
+        outer
+    }
+    #[func] pub fn get_exact_length(&self) -> Variant {
+        match self.exact_length {
+            Some(l) => l.to_variant(),
+            None => Variant::nil(),
+        }
+    }
+    #[func] pub fn is_loaded(&self) -> bool { self.metainfo.is_some() }
+    #[func] pub fn get_manifest(&self) -> GString { GString::from(&self.manifest) }
+    #[func] pub fn get_web_seed(&self) -> GString { GString::from(&self.web_seed) }
+    #[func] pub fn get_search_keywords(&self) -> GString { GString::from(&self.search_keywords) }
+    #[func] pub fn get_source(&self) -> GString { GString::from(&self.source) }
+    #[func] pub fn get_hash_type(&self) -> GString { GString::from(&self.hash_type) }
+
+    #[func]
+    pub fn poll_metadata(&mut self) -> bool {
+        let data = if let Ok(mut lock) = self.fetched_data.try_lock() {
+            lock.take()
+        } else {
+            None
+        };
+        
+        if let Some(d) = data {
+            self.on_metadata_fetched(d.into());
+            return true;
+        }
+        false
+    }
+
+    #[func]
+    pub fn fetch_metadata(&mut self) {
+        let hash_array = match self.info_hash {
+            Some(h) => h,
+            None => {
+                godot_error!("Cannot fetch metadata: No info hash set.");
+                return;
+            }
+        };
+
+        let mut trackers = Vec::new();
+        for tier in &self.announce_list {
+            for tr_url in tier {
+                if let Ok(tr) = tr_url.parse::<demagnetize::tracker::Tracker>() {
+                    trackers.push(Arc::new(tr));
+                }
+            }
+        }
+
+        // Add fallback trackers if none found to increase success rate
+        if trackers.is_empty() {
+            let fallbacks = [
+                "udp://tracker.opentrackr.org:1337/announce",
+                "udp://9.rarbg.com:2810/announce",
+                "udp://tracker.openbittorrent.com:6969/announce",
+                "udp://exodus.desync.com:6969/announce",
+                "udp://www.torrent.eu.org:451/announce",
+            ];
+            for tr_url in fallbacks {
+                if let Ok(tr) = tr_url.parse::<demagnetize::tracker::Tracker>() {
+                    trackers.push(Arc::new(tr));
+                }
+            }
+        }
+
+        let magnet = demagnetize::magnet::Magnet {
+            info_hash: demagnetize::types::InfoHash(hash_array),
+            display_name: if self.display_name.is_empty() { None } else { Some(self.display_name.clone()) },
+            trackers,
+        };
+
+        let fetched_data = self.fetched_data.clone();
+        
+        RUNTIME.spawn(async move {
+            let cfg = demagnetize::config::Config::default();
+            let mut rng = rand::thread_rng();
+            let app = Arc::new(demagnetize::app::App::new(cfg, rng));
+            
+            match magnet.get_torrent_file(app.clone()).await {
+                Ok(torrent_file) => {
+                    let bytes = torrent_file.info.data.to_vec();
+                    if let Ok(mut lock) = fetched_data.lock() {
+                        *lock = Some(bytes);
+                    }
+                }
+                Err(e) => {
+                    godot_error!("Failed to fetch metadata: {}", e);
+                }
+            }
+            app.shutdown().await;
+        });
+    }
+
+    #[func]
+    fn on_metadata_fetched(&mut self, bytes: PackedByteArray) {
+        let contents = bytes.to_vec();
+        godot_print!("Received metadata: {} bytes", contents.len());
+        // godot_print!("Hex: {}", hex::encode(&contents));
+
+        // Metainfo::new expects a full torrent dict with an "info" key.
+        // We wrap the received info dict: d4:info<contents>e
+        let mut wrapped = Vec::new();
+        wrapped.extend_from_slice(b"d4:info");
+        wrapped.extend_from_slice(&contents);
+        wrapped.push(b'e');
+
+        let torrent_content = Value::new(&wrapped);
+        match Metainfo::new(&torrent_content, &wrapped) {
+            Ok(m) => {
+                self.info_hash = Some(m.info_hash);
+                self.announce_list = m.announce_list.clone();
+                match &m.file {
+                    yatorrent::metadata::infodict::MetainfoFile::SingleFile(f) => self.display_name = f.name.clone(),
+                    yatorrent::metadata::infodict::MetainfoFile::MultiFile(f) => self.display_name = f.name.clone(),
+                }
+                self.metainfo = Some(m);
+                self.base_mut().emit_signal("metadata_loaded", &[]);
+                godot_print!("Metadata loaded successfully for {}", self.display_name);
+            }
+            Err(e) => {
+                godot_error!("Could not parse fetched metadata: {}", e);
+            }
+        }
     }
 }

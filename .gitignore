@@ -8,3 +8,4 @@
 export_presets.cfg
 *.idsig
 *.dll
+rust/rust/Cargo.lock
