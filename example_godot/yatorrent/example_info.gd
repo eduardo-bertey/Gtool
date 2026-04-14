@@ -37,14 +37,14 @@ func test_magnet(uri: String):
 		print("Error en formato de Magnet/Hash")
 
 func test_file(path: String):
-	var info = InfoTorrent.new()
-	if info.load_from_file(path):
+	info_torrent = InfoTorrent.new()
+	if info_torrent.load_from_file(path):
 		print("\n✅ Archivo .torrent cargado localmente:")
-		print("Nombre: ", info.get_display_name())
-		print("Hash: ", info.get_info_hash())
-		print("Tamaño total: ", info.get_total_size())
+		print("Nombre: ", info_torrent.get_display_name())
+		print("Hash: ", info_torrent.get_info_hash())
+		print("Tamaño total: ", info_torrent.get_total_size())
 		
-		var files = info.get_files()
+		var files = info_torrent.get_files()
 		for f in files:
 			print("- ", f.path, " (", String.humanize_size(f.size), ")")
 	else:
@@ -61,7 +61,39 @@ func _on_metadata_ready(info: InfoTorrent):
 	print("Tamaño Total: ", String.humanize_size(info.get_total_size()))
 
 func _on_button_pressed() -> void:
+	if info_torrent.get_info_hash() == "":
+		prints("valor nulo")
+		return
 	print("Total: ", info_torrent.get_total_size())
+	print("Nombre: ", info_torrent.get_display_name())
+	print("Hash: ", info_torrent.get_info_hash())
+	print("All Piece: ", info_torrent.get_piece_count())
+	
+
+	var indice_a_pedir = 0 
+	var hash_bruto = get_hash_de_pieza(indice_a_pedir)
+	var hash_hex = bytes_a_hex(hash_bruto)
+	
+	print("Hash Piece ", indice_a_pedir, " (Hex): ", hash_hex)
+	print("Hash Piece ", indice_a_pedir, " (Raw): ", hash_bruto)
+	print("Tamaño total: ", info_torrent.get_total_size())
+	
+	var files = info_torrent.get_files()
+	for f in files:
+		print("- ", f.path, " (", String.humanize_size(f.size), ")")
+
+# hash de 20 bytes de una pieza 
+func get_hash_de_pieza(indice: int) -> PackedByteArray:
+	var todos_los_hashes = info_torrent.get_piece_hashes()
+	var inicio = indice * 20
+	return todos_los_hashes.slice(inicio, inicio + 20)
+
+# Convierte de Bytes a Hexadecimal (SHA1 format)
+func bytes_a_hex(bytes: PackedByteArray) -> String:
+	var hex = ""
+	for b in bytes:
+		hex += "%02x" % b
+	return hex
 
 
 func _on_uri_pressed() -> void:

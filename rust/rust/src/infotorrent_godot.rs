@@ -197,6 +197,16 @@ impl InfoTorrent {
     }
 
     #[func]
+    pub fn get_piece_hash(&self, piece_index: i32) -> PackedByteArray {
+        if let Some(m) = &self.metainfo {
+            if let Some(piece) = m.pieces.get(piece_index as usize) {
+                return PackedByteArray::from_iter(piece.iter().copied());
+            }
+        }
+        PackedByteArray::new()
+    }
+
+    #[func]
     pub fn get_total_size(&self) -> u64 {
         if let Some(m) = &self.metainfo {
              m.get_files().iter().map(|f| f.1).sum()
