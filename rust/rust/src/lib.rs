@@ -56,4 +56,8 @@ mod pkarrgodot;
 mod shamir_godot;
 mod cuckoo_godot;
 mod infotorrent_godot;
+/*comentar para probar en local si conpilas con g++ de gnu
+conpilado con msvc no es necesario */
+
 mod xlstm_large_node;
+mod minrnn_node;
