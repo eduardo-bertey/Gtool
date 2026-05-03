@@ -71,6 +71,9 @@ impl Magnet {
         let (peer_tasks, mut receiver) = WorkerNursery::new(app.cfg.peers.jobs_per_magnet);
         let peer_job = tokio::spawn(async move {
             while let Some(peer) = peer_stream.next().await {
+                if let Some(ref cb) = app.on_peer_discovered {
+                    cb(peer.address, peer.id.map(|pid| pid.0));
+                }
                 peer_tasks
                     .spawn({
                         let this = Arc::clone(&this);

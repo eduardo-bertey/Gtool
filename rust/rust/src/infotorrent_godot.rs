@@ -32,6 +32,7 @@ pub struct InfoTorrent {
     acceptable_source: String,
     manifest: String,
     fetched_data: Arc<Mutex<Option<Vec<u8>>>>,
+    full_metadata_bytes: Arc<Mutex<Option<Vec<u8>>>>,
 }
 
 // Signals are now part of the main impl block below
@@ -53,6 +54,7 @@ impl IRefCounted for InfoTorrent {
             acceptable_source: String::new(),
             manifest: String::new(),
             fetched_data: Arc::new(Mutex::new(None)),
+            full_metadata_bytes: Arc::new(Mutex::new(None)),
         }
     }
 }
@@ -280,6 +282,46 @@ impl InfoTorrent {
     }
 
     #[func]
+    pub fn save_torrent_file(&self, path: GString) -> bool {
+        if let Ok(lock) = self.full_metadata_bytes.lock() {
+            if let Some(bytes) = lock.as_ref() {
+                return fs::write(path.to_string(), bytes).is_ok();
+            }
+        }
+        false
+    }
+
+    #[func]
+    pub fn get_peers(&self) -> PackedStringArray {
+        if let Ok(ips) = crate::state::GLOBAL_IPS.lock() {
+            PackedStringArray::from_iter(ips.iter().map(GString::from))
+        } else {
+            PackedStringArray::new()
+        }
+    }
+
+    #[func]
+    pub fn get_peer_ips_dict(&self) -> VarDictionary {
+        let mut d = VarDictionary::new();
+        if let Ok(peers) = crate::state::PEER_IPS.lock() {
+            for (id, ips) in peers.iter() {
+                let mut arr = PackedStringArray::new();
+                for ip in ips { arr.push(&GString::from(ip)); }
+                d.insert(GString::from(id), arr);
+            }
+        }
+        d
+    }
+
+    #[func]
+    pub fn clear_peers(&self) {
+        crate::state::clear_global_ips();
+        if let Ok(mut peers) = crate::state::PEER_IPS.lock() {
+            peers.clear();
+        }
+    }
+
+    #[func]
     pub fn fetch_metadata(&mut self) {
         let hash_array = match self.info_hash {
             Some(h) => h,
@@ -321,17 +363,34 @@ impl InfoTorrent {
         };
 
         let fetched_data = self.fetched_data.clone();
+        let full_metadata_bytes = self.full_metadata_bytes.clone();
         
         RUNTIME.spawn(async move {
             let cfg = demagnetize::config::Config::default();
             let mut rng = rand::thread_rng();
-            let app = Arc::new(demagnetize::app::App::new(cfg, rng));
+            let mut app_obj = demagnetize::app::App::new(cfg, rng);
+            
+            // Set the callback to capture discovered peers
+            app_obj.on_peer_discovered = Some(Box::new(|addr, id_opt| {
+                let addr_str = addr.to_string(); // Esto devuelve "IP:PUERTO"
+                crate::state::add_global_peer(addr_str.clone());
+                if let Some(id_bytes) = id_opt {
+                    crate::state::add_peer_address(hex::encode(id_bytes), addr_str);
+                }
+            }));
+            
+            let app = Arc::new(app_obj);
             
             match magnet.get_torrent_file(app.clone()).await {
                 Ok(torrent_file) => {
-                    let bytes = torrent_file.info.data.to_vec();
+                    let info_bytes = torrent_file.info.data.to_vec();
+                    let full_bytes = bytes::Bytes::from(torrent_file).to_vec();
+                    
                     if let Ok(mut lock) = fetched_data.lock() {
-                        *lock = Some(bytes);
+                        *lock = Some(info_bytes);
+                    }
+                    if let Ok(mut lock) = full_metadata_bytes.lock() {
+                        *lock = Some(full_bytes);
                     }
                 }
                 Err(e) => {

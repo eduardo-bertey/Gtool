@@ -1,14 +1,17 @@
 [gd_scene format=3 uid="uid://v0sked7wrod7"]
 
-[ext_resource type="Script" uid="uid://dhg37742alye1" path="res://example_godot/menutest.gd" id="1_kw2sm"]
+[ext_resource type="Script" uid="uid://20cerseskbyw" path="res://example_godot/menutest.gd" id="1_kw2sm"]
 [ext_resource type="PackedScene" uid="uid://bwlmqs4l40mxf" path="res://example_godot/exit.tscn" id="2_b4xnm"]
-[ext_resource type="Script" uid="uid://cut3h2hvatunb" path="res://example_godot/notrngd/nostr_gift.gd" id="3_5vvlr"]
-[ext_resource type="Script" uid="uid://c72ls80r7imbb" path="res://example_godot/notrngd/nostr_observer.gd" id="4_iysho"]
-[ext_resource type="Script" uid="uid://dcc17fpvw56b1" path="res://example_godot/notrngd/pkarr.gd" id="5_otp6s"]
-[ext_resource type="Script" uid="uid://hh05maudqtm5" path="res://example_godot/notrngd/key.gd" id="6_jiddj"]
-[ext_resource type="Script" uid="uid://ddpcmpiqap35y" path="res://example_godot/notrngd/nostronger.gd" id="7_nh302"]
-[ext_resource type="Script" uid="uid://dn0iqmjagqqtw" path="res://example_godot/notrngd/shamir.gd" id="8_u71j4"]
-[ext_resource type="Script" uid="uid://dx3losg76al1m" path="res://example_godot/notrngd/cukoo.gd" id="9_hh8st"]
+[ext_resource type="Script" uid="uid://5wkwuqp02h4m" path="res://example_godot/notrngd/nostr_gift.gd" id="3_5vvlr"]
+[ext_resource type="Script" uid="uid://dxfxlktnwhq85" path="res://example_godot/notrngd/nostr_observer.gd" id="4_iysho"]
+[ext_resource type="Script" uid="uid://cvyej5wytebh2" path="res://example_godot/notrngd/pkarr.gd" id="5_otp6s"]
+[ext_resource type="Script" uid="uid://dksnem7fytx74" path="res://example_godot/notrngd/key.gd" id="6_jiddj"]
+[ext_resource type="Script" uid="uid://dqir68fdcojj5" path="res://example_godot/notrngd/nostronger.gd" id="7_nh302"]
+[ext_resource type="Script" uid="uid://cu3t5h2tv00db" path="res://example_godot/notrngd/shamir.gd" id="8_u71j4"]
+[ext_resource type="Script" uid="uid://bd8i703qi2byb" path="res://example_godot/notrngd/cukoo.gd" id="9_hh8st"]
+[ext_resource type="Script" uid="uid://c8sj7cq4i8coc" path="res://example_godot/notrngd/xlstm.gd" id="10_dqqyj"]
+[ext_resource type="Script" uid="uid://7pbgfniyey1m" path="res://example_godot/notrngd/yatorrent.gd" id="11_t7qn0"]
+[ext_resource type="Script" uid="uid://d3lk54myi1xqx" path="res://example_godot/notrngd/itorrent.gd" id="12_lmec7"]
 
 [node name="menu" type="Control" unique_id=680400326]
 layout_mode = 3
@@ -83,6 +86,21 @@ layout_mode = 2
 text = "cukoo hash"
 script = ExtResource("9_hh8st")
 
+[node name="xlstm" type="Button" parent="TabContainer" unique_id=1683276473]
+layout_mode = 2
+text = "xlstm"
+script = ExtResource("10_dqqyj")
+
+[node name="minrnn" type="Button" parent="TabContainer" unique_id=2052877465]
+layout_mode = 2
+text = "minRNN"
+script = ExtResource("11_t7qn0")
+
+[node name="itorrent" type="Button" parent="TabContainer" unique_id=1715904638]
+layout_mode = 2
+text = "itorren"
+script = ExtResource("12_lmec7")
+
 [node name="TextEdit" type="TextEdit" parent="." unique_id=1028781057]
 layout_mode = 0
 offset_left = 220.0
@@ -114,3 +132,9 @@ tab_input_mode = false
 [connection signal="pressed" from="TabContainer/shamir" to="." method="_on_shamir_pressed"]
 [connection signal="mouse_entered" from="TabContainer/cukoo" to="TabContainer/cukoo" method="_on_mouse_entered"]
 [connection signal="pressed" from="TabContainer/cukoo" to="." method="_on_cukoo_pressed"]
+[connection signal="mouse_entered" from="TabContainer/xlstm" to="TabContainer/xlstm" method="_on_mouse_entered"]
+[connection signal="pressed" from="TabContainer/xlstm" to="." method="_on_xlstm_pressed"]
+[connection signal="mouse_entered" from="TabContainer/minrnn" to="TabContainer/minrnn" method="_on_mouse_entered"]
+[connection signal="pressed" from="TabContainer/minrnn" to="." method="_on_minrnn_pressed"]
+[connection signal="mouse_entered" from="TabContainer/itorrent" to="TabContainer/itorrent" method="_on_mouse_entered"]
+[connection signal="pressed" from="TabContainer/itorrent" to="." method="_on_itorrent_pressed"]

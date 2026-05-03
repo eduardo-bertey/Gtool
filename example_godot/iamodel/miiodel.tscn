@@ -10,6 +10,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2007236595]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.29411766, 0.08627451, 0.18431373, 1)
+
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=4824984]
 layout_mode = 1
 anchors_preset = 15
@@ -48,7 +57,21 @@ text = "Entrenar Modelo"
 
 [node name="XLSTMLargeChat" type="XLSTMLargeChat" parent="." unique_id=1715614392]
 num_blocks = 3
+lr = 0.008
 num_epochs = 3
-model_file = "user://large_model.mpk"
-tokenizer_path = "user://tokenizer.json"
+batch_size = 8
+model_file = "res://large_model.mpk"
+tokenizer_path = "res://tokenizer.json"
 script = ExtResource("1_2pabi")
+
+[node name="Button" type="Button" parent="XLSTMLargeChat" unique_id=1894643642]
+anchors_preset = -1
+anchor_right = 0.072000004
+anchor_bottom = 0.048
+offset_left = 1038.0
+offset_top = 6.0
+offset_right = 1055.056
+offset_bottom = 21.896
+text = "exit"
+
+[connection signal="pressed" from="XLSTMLargeChat/Button" to="XLSTMLargeChat" method="_on_button_pressed"]

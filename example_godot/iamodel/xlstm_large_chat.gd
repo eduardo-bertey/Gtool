@@ -27,7 +27,7 @@ func _ready() -> void:
 	# Delay inicial para UI
 	await get_tree().create_timer(0.1).timeout
 	
-	var training_path = ProjectSettings.globalize_path("res://../texto.txt")
+	var training_path = ProjectSettings.globalize_path("res://texto.txt")
 	
 	# Si el tokenizador ya existe, no le pasamos el archivo de texto para evitar re-entrenamiento
 	var init_train_arg = training_path
@@ -67,7 +67,7 @@ func _on_generate_pressed():
 	input.clear()
 
 func _on_train_pressed():
-	var training_path = ProjectSettings.globalize_path("res://../texto.txt")
+	var training_path = ProjectSettings.globalize_path("res://texto.txt")
 	
 	if not FileAccess.file_exists(training_path):
 		output.append_text("\n[color=red]Error: No se encuentra 'texto.txt' en la raíz para entrenar.[/color]")
@@ -93,3 +93,8 @@ func _on_train_pressed():
 func set_buttons_enabled(enabled: bool):
 	gen_button.disabled = !enabled
 	train_button.disabled = !enabled
+
+
+func _on_button_pressed() -> void:
+	$"..".queue_free()
+	pass # Replace with function body.

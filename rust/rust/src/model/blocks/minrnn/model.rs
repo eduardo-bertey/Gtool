@@ -95,11 +95,11 @@ impl<B: Backend> MinRnnLM<B> {
         x: Tensor<B, 2, Int>, 
         state: Option<MinRnnLMState<B>>
     ) -> (Tensor<B, 3>, MinRnnLMState<B>) {
-        let [b, s] = x.dims();
+        let [_b, _s] = x.dims();
         let mut x = self.embedding.forward(x);
         
         let mut next_layer_states = Vec::with_capacity(self.layers.len());
-        let mut current_states = state.map(|s| s.layer_states).unwrap_or_else(|| Vec::new());
+        let current_states = state.map(|s| s.layer_states).unwrap_or_else(|| Vec::new());
         
         for (i, layer) in self.layers.iter().enumerate() {
             let layer_state = current_states.get(i).cloned();

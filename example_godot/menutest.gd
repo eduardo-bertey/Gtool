@@ -68,3 +68,33 @@ func _on_cukoo_pressed() -> void:
 	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
 
 	pass # Replace with function body.
+
+
+func _on_xlstm_pressed() -> void:
+	var data_exten = load("res://example_godot/iamodel/miiodel.tscn").instantiate()
+
+	self.add_child(data_exten)
+	
+	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
+	pass # Replace with function body.
+
+
+
+
+
+func _on_minrnn_pressed() -> void:
+	var data_exten = load("res://example_godot/iamodel/minrnn.tscn").instantiate()
+
+	self.add_child(data_exten)
+	
+	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
+	pass # Replace with function body.
+
+
+func _on_itorrent_pressed() -> void:
+	var data_exten = load("res://example_godot/yatorrent/yatorrent.tscn.tscn").instantiate()
+
+	self.add_child(data_exten)
+	
+	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
+	pass # Replace with function body.

@@ -9,12 +9,24 @@ use std::fmt;
 use thiserror::Error;
 use tokio::sync::Mutex;
 
-#[derive(Debug)]
 pub struct App {
     pub cfg: Config,
     pub local: LocalPeer,
     pub shutdown_group: ShutdownGroup,
     dht_handle: Mutex<Option<DhtHandle>>,
+    pub on_peer_discovered: Option<Box<dyn Fn(std::net::SocketAddr, Option<[u8; 20]>) + Send + Sync>>,
+}
+
+impl fmt::Debug for App {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("App")
+            .field("cfg", &self.cfg)
+            .field("local", &self.local)
+            .field("shutdown_group", &self.shutdown_group)
+            .field("dht_handle", &self.dht_handle)
+            .field("on_peer_discovered", &self.on_peer_discovered.as_ref().map(|_| "Some(Fn)"))
+            .finish()
+    }
 }
 
 impl App {
@@ -28,6 +40,7 @@ impl App {
             local,
             shutdown_group: ShutdownGroup::new(),
             dht_handle: Mutex::new(None),
+            on_peer_discovered: None,
         }
     }
 

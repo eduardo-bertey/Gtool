@@ -23,3 +23,23 @@ pub static ID_IPFS: Lazy<Mutex<Vec<String>>> = Lazy::new(|| Mutex::new(Vec::new(
 pub static PEER_IPS: Lazy<Mutex<HashMap<String, Vec<String>>>> = Lazy::new(|| {
     Mutex::new(HashMap::new())
 });
+
+pub fn add_global_peer(address: String) {
+    if let Ok(mut ips) = GLOBAL_IPS.lock() {
+        if !ips.contains(&address) {
+            ips.push(address);
+        }
+    }
+}
+
+pub fn add_peer_address(id: String, address: String) {
+    if let Ok(mut peers) = PEER_IPS.lock() {
+        peers.entry(id).or_insert_with(Vec::new).push(address);
+    }
+}
+
+pub fn clear_global_ips() {
+    if let Ok(mut ips) = GLOBAL_IPS.lock() {
+        ips.clear();
+    }
+}

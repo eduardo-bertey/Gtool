@@ -5,37 +5,49 @@
 [node name="Yatorrent_tscn" type="Node" unique_id=1968014074]
 script = ExtResource("1_0tiqh")
 
-[node name="Button" type="Button" parent="." unique_id=476293348]
-offset_right = 252.0
-offset_bottom = 96.0
+[node name="ColorRect" type="ColorRect" parent="." unique_id=418606285]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.22352941, 0.27450982, 0.19215687, 1)
+
+[node name="info" type="Button" parent="." unique_id=476293348]
+offset_left = 12.0
+offset_top = 1.0
+offset_right = 173.0
+offset_bottom = 97.0
 text = "info"
 
 [node name="uri" type="Button" parent="." unique_id=940184126]
-offset_left = -1.0
-offset_top = 135.0
-offset_right = 226.0
-offset_bottom = 243.0
+offset_left = 205.0
+offset_top = 3.0
+offset_right = 366.0
+offset_bottom = 97.0
 text = "uri"
 
 [node name="torrent" type="Button" parent="." unique_id=2116412786]
-offset_left = 293.0
-offset_top = 135.0
-offset_right = 543.0
-offset_bottom = 242.0
+offset_left = 396.0
+offset_top = 4.0
+offset_right = 538.0
+offset_bottom = 100.0
 text = "torrent"
 
 [node name="piece" type="Button" parent="." unique_id=1847879810]
-offset_left = 14.0
-offset_top = 289.0
-offset_right = 247.0
-offset_bottom = 386.0
+offset_left = 47.0
+offset_top = 116.0
+offset_right = 226.0
+offset_bottom = 163.0
 text = "piece"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=535131596]
-offset_left = 254.0
-offset_top = 291.0
-offset_right = 521.0
-offset_bottom = 389.0
+offset_left = 240.0
+offset_top = 110.0
+offset_right = 500.0
+offset_bottom = 186.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -51,7 +63,24 @@ size_flags_vertical = 3
 text = "44493"
 placeholder_text = "port"
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[node name="panel" type="TextEdit" parent="." unique_id=1622009197]
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.96900004
+offset_left = 548.0
+offset_top = 10.0
+offset_right = -3.0
+offset_bottom = 0.08795166
+
+[node name="exit" type="Button" parent="." unique_id=1358286268]
+offset_left = 1037.0
+offset_top = 9.0
+offset_right = 1138.0
+offset_bottom = 48.0
+text = "exit"
+
+[connection signal="pressed" from="info" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="uri" to="." method="_on_uri_pressed"]
 [connection signal="pressed" from="torrent" to="." method="_on_torrent_pressed"]
 [connection signal="pressed" from="piece" to="." method="_on_piece_pressed"]
+[connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]

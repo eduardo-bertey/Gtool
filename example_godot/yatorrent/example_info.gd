@@ -47,7 +47,8 @@ func test_file(path: String):
 		print("Nombre: ", info_torrent.get_display_name())
 		print("Hash: ", info_torrent.get_info_hash())
 		print("Tamaño total: ", info_torrent.get_total_size())
-		
+		prints( info_torrent.get_files())
+		prints("pieses ",info_torrent.get_piece_count())
 		var files = info_torrent.get_files()
 		for f in files:
 			print("- ", f.path, " (", String.humanize_size(f.size), ")")
@@ -72,7 +73,9 @@ func _on_button_pressed() -> void:
 	print("Nombre: ", info_torrent.get_display_name())
 	print("Hash: ", info_torrent.get_info_hash())
 	print("All Piece: ", info_torrent.get_piece_count())
-	
+	$panel.text += "Nombre: "+ str( info_torrent.get_display_name() + "\n")
+	$panel.text += "Hash: "+ str( info_torrent.get_info_hash()+ "\n")
+	$panel.text += "All Piece: "+ str( info_torrent.get_piece_count())+ "\n"
 
 	var indice_a_pedir = 0 
 	var hash_bruto = get_hash_de_pieza(indice_a_pedir)
@@ -145,3 +148,8 @@ func _on_piece_pressed() -> void:
 		int(info_torrent.get_total_size()),    # tamaño TOTAL del torrent
 		info_torrent.get_piece_hash(piece_idx)
 	)
+
+
+func _on_exit_pressed() -> void:
+	queue_free()
+	pass # Replace with function body.

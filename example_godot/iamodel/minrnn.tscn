@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://cy6jlxtx1ie1r"]
+
+[ext_resource type="Script" uid="uid://cdbkl885wumgt" path="res://example_godot/iamodel/minrnn.gd" id="1_kms0c"]
+
+[node name="minrnn" type="Control" unique_id=669313795]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kms0c")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2081835445]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.22352941, 0.08627451, 0.3529412, 1)
+
+[node name="MinRNNChat" type="MinRNNChat" parent="." unique_id=1011891971]
+
+[node name="exit" type="Button" parent="." unique_id=288422587]
+layout_mode = 0
+offset_left = 1054.0
+offset_top = 6.0
+offset_right = 1136.0
+offset_bottom = 48.0
+text = "exit"
+
+[connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]
