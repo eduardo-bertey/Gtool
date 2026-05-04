@@ -38,8 +38,11 @@ pub fn add_peer_address(id: String, address: String) {
     }
 }
 
-pub fn clear_global_ips() {
-    if let Ok(mut ips) = GLOBAL_IPS.lock() {
+pub fn try_clear_global_ips() -> bool {
+    if let Ok(mut ips) = GLOBAL_IPS.try_lock() {
         ips.clear();
+        true
+    } else {
+        false
     }
 }

@@ -1,7 +1,7 @@
 # Gtool GDextension / Extensión GD de Gtool
 
-> ES: Extensión para Godot que añade soporte P2P, DNS descentralizado y criptografía con Nostrn y PKARR.  
-> EN: GDextension for Godot adding P2P support, decentralized DNS, and cryptography with Nostrn and PKARR.
+> ES: Extensión para Godot que añade soporte P2P (BitTorrent), DNS descentralizado, criptografía e Inteligencia Artificial nativa (xLSTM) con capacidades de inferencia y entrenamiento.  
+> EN: GDextension for Godot adding P2P support (BitTorrent), decentralized DNS, cryptography, and native AI (xLSTM) with inference and training capabilities.
 
 ---
 
@@ -10,15 +10,15 @@
 - **ES:** Gtool es una extensión modular para Godot que integra funciones de red descentralizada y seguridad.  
 - **EN:** Gtool is a modular extension for Godot that integrates decentralized networking and security.
 
-- **ES:** Incluye clientes Nostrn (simple y con observadores), generación de claves compartidas y soporte para resolución DNS distribuida.  
-- **EN:** Includes Nostrn clients (simple and observer), shared key generation, and support for distributed DNS resolution.
+- **ES:** Incluye clientes Nostrn (simple y con observadores), resolución DNS distribuida, soporte para BitTorrent y un motor de IA (xLSTM) con soporte completo para entrenamiento.  
+- **EN:** Includes Nostrn clients (simple and observer), distributed DNS resolution, BitTorrent support, and an AI engine (xLSTM) with full training support.
 
 ---
 
 ## Características principales / Key features
 
-- **ES:** Cliente Torrent para compartir y verificar recursos.  
-- **EN:** Torrent client for resource sharing and verification.
+- **ES:** Cliente BitTorrent: soporte para Magnet links, trackers UDP/HTTP y descubrimiento de peers asíncrono.  
+- **EN:** BitTorrent Client: support for Magnet links, UDP/HTTP trackers, and asynchronous peer discovery.
 
 - **ES:** PKARR DNS: resolución y publicación de registros descentralizados.  
 - **EN:** PKARR DNS: decentralized resolution and record publishing.
@@ -50,6 +50,9 @@
 
 - **ES:** Cuckoo Filter: almacenamiento de hashes ultra eficiente, reduce el tamaño y permite verificar pertenencia de mensajes o partes de archivos.  
 - **EN:** Cuckoo Filter: ultra-efficient hash storage, reduces size and allows checking membership of messages or file parts.
+
+- **ES:** IA Nativa (xLSTM): Soporte para modelos de lenguaje xLSTM, permitiendo inferencia, gestión de estado de entrenamiento y tokenización profesional desde el primer día.  
+- **EN:** Native AI (xLSTM): Support for xLSTM language models, allowing inference, training state management, and professional tokenization from day zero.
 
 ---
 
@@ -127,6 +130,51 @@ var shares = shamir.create_shares(secret, 5, 3)
 # Combinar trozos para recuperar / Combine shares to recover
 var recovered = shamir.combine_shares([shares[0], shares[2], shares[4]])
 print(recovered.get_string_from_utf8())
+```
+
+### IA Nativa (xLSTM)
+```gdscript
+var ai = XLSTMLargeChat.new()
+
+# Inicializar sesión (entrena tokenizador si no existe)
+# Initialize session (trains tokenizer if it doesn't exist)
+ai.init_session("datos_entrenamiento.txt")
+
+# Entrenar el modelo con un archivo de texto / Train model with a text file
+ai.train_on_file("conocimiento.txt")
+
+# Generar texto basado en un seed / Generate text based on a seed
+var response = ai.generate("El futuro de Gtool es", 50)
+print("IA: ", response)
+
+# Guardar estado del modelo / Save model state
+ai.save_model("mi_modelo_ia.mpk")
+```
+
+### BitTorrent & Magnet Links
+```gdscript
+var torrent = InfoTorrent.new()
+
+# Cargar desde Magnet URI / Load from Magnet URI
+if torrent.load_from_magnet("magnet:?xt=urn:btih:01c13728..."):
+	# Añadir trackers personalizados / Add custom trackers
+	torrent.add_tracker("udp://tracker.opentrackr.org:1337/announce")
+	
+	# Iniciar búsqueda de metadatos en segundo plano (Asíncrono)
+	# Start background metadata fetching (Asynchronous)
+	torrent.fetch_metadata()
+
+func _process(_delta):
+	# Revisar si la metadata terminó de cargar / Check if metadata finished loading
+	if torrent.poll_metadata():
+		print("Torrent listo: ", torrent.get_display_name())
+		print("Archivos: ", torrent.get_files())
+	
+	# Consultar peers descubiertos sin bloquear el juego
+	# Query discovered peers without blocking the game
+	var peers = torrent.get_peers()
+	if peers.size() > 0 and peers[0] != "await":
+		print("Peers activos: ", peers)
 ```
 
 ---

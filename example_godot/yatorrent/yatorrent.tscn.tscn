@@ -79,8 +79,24 @@ offset_right = 1138.0
 offset_bottom = 48.0
 text = "exit"
 
+[node name="getpeer" type="Button" parent="." unique_id=298785049]
+offset_left = 15.0
+offset_top = 213.0
+offset_right = 160.0
+offset_bottom = 273.0
+text = "get peer"
+
+[node name="clearpanel" type="Button" parent="." unique_id=986016083]
+offset_left = 956.0
+offset_top = 13.0
+offset_right = 1050.0
+offset_bottom = 44.0
+text = "clear panel"
+
 [connection signal="pressed" from="info" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="uri" to="." method="_on_uri_pressed"]
 [connection signal="pressed" from="torrent" to="." method="_on_torrent_pressed"]
 [connection signal="pressed" from="piece" to="." method="_on_piece_pressed"]
 [connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="getpeer" to="." method="_on_getpeer_pressed"]
+[connection signal="pressed" from="clearpanel" to="." method="_on_clearpanel_pressed"]

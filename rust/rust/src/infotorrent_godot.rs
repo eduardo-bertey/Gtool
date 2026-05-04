@@ -293,31 +293,48 @@ impl InfoTorrent {
 
     #[func]
     pub fn get_peers(&self) -> PackedStringArray {
-        if let Ok(ips) = crate::state::GLOBAL_IPS.lock() {
-            PackedStringArray::from_iter(ips.iter().map(GString::from))
-        } else {
-            PackedStringArray::new()
+        match crate::state::GLOBAL_IPS.try_lock() {
+            Ok(ips) => PackedStringArray::from_iter(ips.iter().map(GString::from)),
+            Err(_) => {
+                let mut arr = PackedStringArray::new();
+                arr.push(&GString::from("await"));
+                arr
+            }
         }
     }
 
     #[func]
     pub fn get_peer_ips_dict(&self) -> VarDictionary {
         let mut d = VarDictionary::new();
-        if let Ok(peers) = crate::state::PEER_IPS.lock() {
-            for (id, ips) in peers.iter() {
-                let mut arr = PackedStringArray::new();
-                for ip in ips { arr.push(&GString::from(ip)); }
-                d.insert(GString::from(id), arr);
+        match crate::state::PEER_IPS.try_lock() {
+            Ok(peers) => {
+                for (id, ips) in peers.iter() {
+                    let mut arr = PackedStringArray::new();
+                    for ip in ips { arr.push(&GString::from(ip)); }
+                    d.insert(GString::from(id), arr);
+                }
+            }
+            Err(_) => {
+                d.insert("status", "await");
             }
         }
         d
     }
 
     #[func]
-    pub fn clear_peers(&self) {
-        crate::state::clear_global_ips();
-        if let Ok(mut peers) = crate::state::PEER_IPS.lock() {
+    pub fn clear_peers(&self) -> GString {
+        let global_cleared = crate::state::try_clear_global_ips();
+        let mut peers_cleared = false;
+        
+        if let Ok(mut peers) = crate::state::PEER_IPS.try_lock() {
             peers.clear();
+            peers_cleared = true;
+        }
+        
+        if global_cleared && peers_cleared {
+            "ok".into()
+        } else {
+            "await".into()
         }
     }
 
