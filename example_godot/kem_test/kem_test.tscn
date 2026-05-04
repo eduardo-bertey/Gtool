@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://lngmris1qso8" path="res://example_godot/kem_test/example_kem.gd" id="1"]
+
+[node name="KemTest" type="Node"]
+script = ExtResource("1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "🔐 KEM Post-Quantum Crypto Test"
+horizontal_alignment = 1
+
+[node name="HBoxButtons" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="TestAll" type="Button" parent="VBoxContainer/HBoxButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Test All Algorithms"
+
+[node name="TestXWing" type="Button" parent="VBoxContainer/HBoxButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Test XWing Draft06"
+
+[node name="TestManual" type="Button" parent="VBoxContainer/HBoxButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Test Manual"
+
+[node name="Benchmark" type="Button" parent="VBoxContainer/HBoxButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Benchmark (10x)"
+
+[node name="Clear" type="Button" parent="VBoxContainer/HBoxButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Clear"
+
+[node name="panel" type="RichTextLabel" parent="."]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 80.0
+offset_right = 1150.0
+offset_bottom = 680.0
+text = ""
+scroll_following = true
+
+[connection signal="pressed" from="VBoxContainer/HBoxButtons/TestAll" to="." method="_on_test_all_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxButtons/TestXWing" to="." method="_on_test_xwing_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxButtons/TestManual" to="." method="_on_test_manual_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxButtons/Benchmark" to="." method="_on_benchmark_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxButtons/Clear" to="." method="_on_clear_pressed"]
