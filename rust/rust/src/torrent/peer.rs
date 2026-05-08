@@ -314,15 +314,29 @@ pub fn request_piece(
         stream.write_all(&req).map_err(|e| format!("Failed to send block request: {}", e))?;
 
         // Receive Piece block
-        stream.read_exact(&mut len_buf).map_err(|e| format!("Failed to read block length: {}", e))?;
-        stream.read_exact(&mut msg_id).map_err(|e| format!("Failed to read block msg ID: {}", e))?;
-        if msg_id[0] != 7 {
-            return Err(format!("Expected piece block (7), got {}", msg_id[0]));
+        let mut piece_received = false;
+        for _ in 0..20 {
+            stream.read_exact(&mut len_buf).map_err(|e| format!("Failed to read block length: {}", e))?;
+            let msg_len = u32::from_be_bytes(len_buf);
+            if msg_len == 0 { continue; }
+            
+            stream.read_exact(&mut msg_id).map_err(|e| format!("Failed to read block msg ID: {}", e))?;
+            
+            if msg_id[0] == 7 {
+                let mut header = [0u8; 8]; // index + begin
+                stream.read_exact(&mut header).map_err(|e| format!("Failed to read block header: {}", e))?;
+                stream.read_exact(&mut piece_data[offset..offset + len]).map_err(|e| format!("Failed to read block data: {}", e))?;
+                piece_received = true;
+                break;
+            } else {
+                let mut payload = vec![0u8; (msg_len - 1) as usize];
+                stream.read_exact(&mut payload).map_err(|e| format!("Failed to skip msg {}: {}", msg_id[0], e))?;
+            }
         }
 
-        let mut header = [0u8; 8]; // index + begin
-        stream.read_exact(&mut header).map_err(|e| format!("Failed to read block header: {}", e))?;
-        stream.read_exact(&mut piece_data[offset..offset + len]).map_err(|e| format!("Failed to read block data: {}", e))?;
+        if !piece_received {
+            return Err(format!("Timed out or received wrong message waiting for piece block"));
+        }
         offset += len;
     }
 

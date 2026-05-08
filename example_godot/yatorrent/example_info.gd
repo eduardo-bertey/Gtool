@@ -118,6 +118,8 @@ func _on_button_pressed() -> void:
 	if info_torrent.get_info_hash() == "":
 		prints("valor nulo")
 		return
+	var conf : String = info_torrent.get_info_hash()
+	print("hash tamaño",conf.length())
 	print("Total: ", info_torrent.get_total_size())
 	print("Nombre: ", info_torrent.get_display_name())
 	print("Hash: ", info_torrent.get_info_hash())
@@ -177,12 +179,16 @@ func get_piece_size(idx) -> int:
 
 
 func _on_uri_pressed() -> void:
-	test_magnet("magnet:?xt=urn:btih:01c137287d6f0ed05a56742dae794f632c79ff3d")
+	#test_magnet("magnet:?xt=urn:btih:01c137287d6f0ed05a56742dae794f632c79ff3d")
+	test_magnet("magnet:?xt=urn:btih:d69f91e6b2ae4c542468d1073a71d4ea13879a7f")
 	pass # Replace with function body.
 
 
 func _on_torrent_pressed() -> void:
-	test_file("C:/Users/Emabe/Downloads/ubuntu-25.10-desktop-amd64.iso.torrent")
+	var absolute_path = ProjectSettings.globalize_path("res://example_godot/torrent/sample.torrent")
+	test_file(absolute_path)
+
+	#test_file("C:/Users/Emabe/Downloads/ubuntu-25.10-desktop-amd64.iso.torrent")
 	pass # Replace with function body.
 
 
@@ -198,6 +204,43 @@ func _on_piece_pressed() -> void:
 		info_torrent.get_piece_hash(piece_idx)
 	)
 
+func dowload(ip , port):
+	var conf : String = info_torrent.get_info_hash()
+	prints(conf.length())
+	var piece_idx = int(inx)
+	data = peer.request_piece_raw(
+		info_torrent.get_info_hash(),
+		str(ip),
+		int(port),
+		piece_idx,
+		get_piece_size(piece_idx),  # tamaño REAL de esta pieza (última puede ser más chica)
+		int(info_torrent.get_total_size()),    # tamaño TOTAL del torrent
+		info_torrent.get_piece_hash(piece_idx)
+	)
+
+func test_localhost(port: int):
+	if not info_torrent.is_loaded():
+		print("Error: El torrent no está cargado. Primero usa 'Cargar Torrent'.")
+		return
+		
+	print("--- Probando Localhost en puerto ", port, " ---")
+	var piece_idx = 0 # Pedimos la primera pieza
+	
+	data = peer.request_piece_raw(
+		info_torrent.get_info_hash(),
+		"127.0.0.1",
+		port,
+		piece_idx,
+		get_piece_size(piece_idx),
+		int(info_torrent.get_total_size()),
+		info_torrent.get_piece_hash(piece_idx)
+	)
+	
+	if data.size() > 0:
+		print("✅ ¡Éxito! Recibida pieza 0 desde localhost (", data.size(), " bytes)")
+		prints(data)
+	else:
+		print("❌ Falló la descarga desde localhost. Revisa el puerto y que el cliente de torrent esté abierto.")
 
 func _on_exit_pressed() -> void:
 	queue_free()
@@ -221,12 +264,61 @@ func update_peers():
 	for ip in peers:
 		count += 1
 		$panel.text += "Peer encontrado: "+ str( ip+ "\n")
+	#	extraer_ip_puerto(ip)
 		print("Peer encontrado: ", ip)
 	$panel.text += "Peer total: "+ str( count)+ "\n"
+
+func loop_test():
+	var peers = info_torrent.get_peers()
+	if peers.size() == 1 and peers[0] == "await":
+
+		return
+	
+	var count = 0
+	for ip in peers:
+		count += 1
+		$panel.text += "Peer automaticos: "+ str( ip+ "\n")
+		var peer = extraer_ip_puerto(ip)
+		dowload(peer.ip , peer.port)
+		print("Peer encontrado: ", ip)
+		if count >= 20:
+			break
+	$panel.text += "Peer consultados: "+ str( count)+ "\n"
 func _on_clear_pressed():
 	info_torrent.clear_peers()
 
 
 func _on_clearpanel_pressed() -> void:
 	$panel.text = ""
+	pass # Replace with function body.
+
+func extraer_ip_puerto(raw_string: String) -> Dictionary:
+	# rfind es el que no falla en G4 para buscar desde el final
+	var cursor: int = raw_string.rfind(":")
+	
+	if cursor == -1:
+		return {"ip": raw_string, "port": 0}
+		
+	var ip: String = raw_string.left(cursor)
+	var port_str: String = raw_string.right(-(cursor + 1))
+	
+	# Limpieza de IPv6: Si empieza con '[' y termina con ']'
+	if ip.begins_with("[") and ip.ends_with("]"):
+		# substr(posicion_inicio, longitud)
+		# Empezamos en 1 y le quitamos 2 a la longitud (el '[' y el ']')
+		ip = ip.substr(1, ip.length() - 2)
+		
+	return {
+		"ip": ip,
+		"port": port_str.to_int()
+	}
+
+
+func _on_autoloop_pressed() -> void:
+	loop_test()
+	pass # Replace with function body.
+
+
+func _on_localhost_pressed() -> void:
+	test_localhost(16556)
 	pass # Replace with function body.

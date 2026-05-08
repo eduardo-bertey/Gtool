@@ -37,11 +37,18 @@ offset_bottom = 100.0
 text = "torrent"
 
 [node name="piece" type="Button" parent="." unique_id=1847879810]
-offset_left = 47.0
-offset_top = 116.0
-offset_right = 226.0
-offset_bottom = 163.0
+offset_left = 30.0
+offset_top = 104.0
+offset_right = 209.0
+offset_bottom = 151.0
 text = "piece"
+
+[node name="autoloop" type="Button" parent="." unique_id=1890082777]
+offset_left = 30.0
+offset_top = 152.0
+offset_right = 212.0
+offset_bottom = 198.0
+text = "auto"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=535131596]
 offset_left = 240.0
@@ -93,10 +100,19 @@ offset_right = 1050.0
 offset_bottom = 44.0
 text = "clear panel"
 
+[node name="localhost" type="Button" parent="." unique_id=600367892]
+offset_left = 185.0
+offset_top = 215.0
+offset_right = 292.0
+offset_bottom = 264.0
+text = "localhost"
+
 [connection signal="pressed" from="info" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="uri" to="." method="_on_uri_pressed"]
 [connection signal="pressed" from="torrent" to="." method="_on_torrent_pressed"]
 [connection signal="pressed" from="piece" to="." method="_on_piece_pressed"]
+[connection signal="pressed" from="autoloop" to="." method="_on_autoloop_pressed"]
 [connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]
 [connection signal="pressed" from="getpeer" to="." method="_on_getpeer_pressed"]
 [connection signal="pressed" from="clearpanel" to="." method="_on_clearpanel_pressed"]
+[connection signal="pressed" from="localhost" to="." method="_on_localhost_pressed"]

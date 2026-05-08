@@ -200,12 +200,21 @@ impl TPeer {
         };
 
         if hash_bytes.len() != 20 {
-            godot_error!("Info hash must be 20 bytes");
+            godot_error!("Info hash must be 20 bytes (hex string of 40 chars). Received: {} bytes decoded", hash_bytes.len());
             return PackedByteArray::new();
         }
 
-        if expected_hash.len() != 20 {
-            godot_error!("Expected hash must be 20 bytes");
+        let mut final_expected_hash = expected_hash.to_vec();
+        
+        // Si recibimos 40 bytes, es probable que sea un string hexadecimal en lugar de bytes puros
+        if final_expected_hash.len() == 40 {
+            if let Ok(decoded) = hex::decode(String::from_utf8_lossy(&final_expected_hash).to_string()) {
+                final_expected_hash = decoded;
+            }
+        }
+
+        if final_expected_hash.len() != 20 {
+            godot_error!("Expected hash must be 20 bytes. Received: {} bytes. (Note: if passing hex string, it must be 40 chars)", final_expected_hash.len());
             return PackedByteArray::new();
         }
 
@@ -218,7 +227,7 @@ impl TPeer {
             total_length as usize,
             &hash_bytes,
             &self.peer_id,
-            expected_hash.as_slice()
+            &final_expected_hash
         ) {
             Ok(data) => {
                 PackedByteArray::from_iter(data.into_iter())

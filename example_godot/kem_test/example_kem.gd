@@ -83,51 +83,55 @@ func _run_manual_test(algo: String) -> void:
 	$panel.text += "▶ Test Manual: %s\n" % algo
 	print("▶ Test Manual: %s" % algo)
 	
-	# 1. Generar par de claves
+	# --- PASO 1: El Receptor (B) crea su identidad ---
 	var t0 = Time.get_ticks_msec()
-	var keys = kem.key_gen(algo)
+	var identidad_B = kem.key_gen(algo)
 	var t1 = Time.get_ticks_msec()
 	
-	if keys == null:
+	if identidad_B == null:
 		print("  ❌ Error en key_gen")
 		$panel.text += "  ❌ Error en key_gen\n"
 		return
 	
-	var sk: PackedByteArray = keys["private_key"]
-	var pk: PackedByteArray = keys["public_key"]
-	print("  1️⃣ key_gen OK (%dms) — SK:%d bytes, PK:%d bytes" % [t1 - t0, sk.size(), pk.size()])
-	$panel.text += "  1️⃣ key_gen OK (%dms) — SK:%d, PK:%d bytes\n" % [t1 - t0, sk.size(), pk.size()]
+	var pk_B: PackedByteArray = identidad_B["public_key"]
+	var sk_B: PackedByteArray = identidad_B["private_key"] # B se guarda esto y no se lo da a nadie
 	
-	# 2. Encapsular (lado B recibe pk, genera shared secret + ciphertext)
+	print("  1️⃣ [Receptor B] key_gen OK (%dms) — SK:%d bytes, PK:%d bytes" % [t1 - t0, sk_B.size(), pk_B.size()])
+	$panel.text += "  1️⃣ [B] key_gen OK (%dms) — SK:%d, PK:%d bytes\n" % [t1 - t0, sk_B.size(), pk_B.size()]
+	
+	# --- PASO 2: El Emisor (A) crea el secreto para B ---
+	# A solo conoce la pk_B (que recibió por la red)
 	var t2 = Time.get_ticks_msec()
-	var encap_result = kem.encapsulate(algo, pk)
+	var resultado_A = kem.encapsulate(algo, pk_B)
 	var t3 = Time.get_ticks_msec()
 	
-	if encap_result == null:
+	if resultado_A == null:
 		print("  ❌ Error en encapsulate")
 		$panel.text += "  ❌ Error en encapsulate\n"
 		return
 	
-	var ss_b: PackedByteArray = encap_result["shared_secret"]
-	var ct: PackedByteArray = encap_result["ciphertext"]
-	print("  2️⃣ encapsulate OK (%dms) — CT:%d bytes, SS:%d bytes" % [t3 - t2, ct.size(), ss_b.size()])
-	$panel.text += "  2️⃣ encapsulate OK (%dms) — CT:%d, SS:%d bytes\n" % [t3 - t2, ct.size(), ss_b.size()]
+	var shared_secret_A: PackedByteArray = resultado_A["shared_secret"]
+	var paquete_CT: PackedByteArray = resultado_A["ciphertext"] # A envía esto a B
 	
-	# 3. Desencapsular (lado A recibe ct, usa sk para recuperar shared secret)
+	print("  2️⃣ [Emisor A] encapsulate OK (%dms) — CT:%d bytes, SS_A:%d bytes" % [t3 - t2, paquete_CT.size(), shared_secret_A.size()])
+	$panel.text += "  2️⃣ [A] encapsulate OK (%dms) — CT:%d, SS_A:%d bytes\n" % [t3 - t2, paquete_CT.size(), shared_secret_A.size()]
+	
+	# --- PASO 3: El Receptor (B) recupera el secreto ---
+	# B recibe el paquete_CT y usa SU PROPIA sk_B
 	var t4 = Time.get_ticks_msec()
-	var ss_a: PackedByteArray = kem.decapsulate(algo, ct, sk)
+	var shared_secret_B: PackedByteArray = kem.decapsulate(algo, paquete_CT, sk_B)
 	var t5 = Time.get_ticks_msec()
 	
-	if ss_a.size() == 0:
+	if shared_secret_B.size() == 0:
 		print("  ❌ Error en decapsulate")
 		$panel.text += "  ❌ Error en decapsulate\n"
 		return
 	
-	print("  3️⃣ decapsulate OK (%dms) — SS:%d bytes" % [t5 - t4, ss_a.size()])
-	$panel.text += "  3️⃣ decapsulate OK (%dms) — SS:%d bytes\n" % [t5 - t4, ss_a.size()]
+	print("  3️⃣ [Receptor B] decapsulate OK (%dms) — SS_B:%d bytes" % [t5 - t4, shared_secret_B.size()])
+	$panel.text += "  3️⃣ [B] decapsulate OK (%dms) — SS_B:%d bytes\n" % [t5 - t4, shared_secret_B.size()]
 	
-	# 4. Verificar que ambos shared secrets son iguales
-	var match_ok = (ss_a == ss_b)
+	# --- VERIFICACIÓN ---
+	var match_ok = (shared_secret_A == shared_secret_B)
 	if match_ok:
 		print("  ✅ VERIFICACIÓN OK — Ambos shared secrets coinciden!")
 		$panel.text += "  ✅ VERIFICACIÓN OK — Shared secrets coinciden!\n"
@@ -136,10 +140,10 @@ func _run_manual_test(algo: String) -> void:
 		$panel.text += "  ❌ VERIFICACIÓN FALLIDA!\n"
 	
 	# Mostrar hex
-	var hex_a = kem.bytes_to_hex(ss_a)
-	var hex_b = kem.bytes_to_hex(ss_b)
-	print("  SS_A: ", hex_a)
-	print("  SS_B: ", hex_b)
+	var hex_a = kem.bytes_to_hex(shared_secret_A)
+	var hex_b = kem.bytes_to_hex(shared_secret_B)
+	print("  SS_A (Emisor): ", hex_a)
+	print("  SS_B (Receptor): ", hex_b)
 	$panel.text += "  SS_A: " + hex_a + "\n"
 	$panel.text += "  SS_B: " + hex_b + "\n\n"
 
