@@ -270,6 +270,14 @@ pub fn request_piece(
                 // Bitfield — leer y descartar
                 let mut bitfield = vec![0u8; payload_len];
                 stream.read_exact(&mut bitfield).map_err(|e| format!("Failed to read bitfield: {}", e))?;
+                
+                // Actualizar estado global con el bitfield del peer
+                crate::state::update_peer_bitfield(
+                    peer_addr.to_string(), 
+                    hex::encode(info_hash), 
+                    bitfield.clone()
+                );
+
                 // Ahora que tenemos el bitfield, enviamos Interested
                 stream.write_all(&[0, 0, 0, 1, 2]).map_err(|e| format!("Failed to send interested: {}", e))?;
             }

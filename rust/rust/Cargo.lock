@@ -43,6 +43,7 @@ dependencies = [
  "sha1",
  "shamirsecretsharing",
  "siphasher",
+ "strsim",
  "thiserror 1.0.69",
  "tokenizers",
  "tokio",

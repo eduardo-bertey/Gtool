@@ -10,5 +10,5 @@ windows.debug.x86_64 =   "res://rust/rust/target/release/Gtool.dll"#"res://rust/
 windows.release.x86_64 = "res://rust/rust/target/release/Gtool.dll"
 macos.debug =            "res://rust/rust/target/debug/Gtool.dylib"
 macos.release =          "res://rust/rust/target/release/Gtool.dylib"
-android.debug.arm64 =    "res://rust/rust/target/aarch64-linux-android/debug/libGtool.so"
+android.debug.arm64 =    "res://addons/libGtool.so"
 android.release.arm64 =  "res://rust/rust/target/aarch64-linux-android/release/libGtool.so"

@@ -172,6 +172,25 @@ impl TPeer {
         GString::from(&result)
     }
 
+    #[func]
+    pub fn get_peer_bitfields(&self) -> VarDictionary {
+        let mut outer_dict = VarDictionary::new();
+        if let Ok(data) = crate::state::PEER_BITFIELDS.lock() {
+            for (peer_addr, hashes) in data.iter() {
+                let mut inner_dict = VarDictionary::new();
+                for (hash, bitfield) in hashes {
+                    let mut pba = PackedByteArray::new();
+                    for &byte in bitfield {
+                        pba.push(byte);
+                    }
+                    inner_dict.insert(GString::from(hash), pba);
+                }
+                outer_dict.insert(GString::from(peer_addr), inner_dict);
+            }
+        }
+        outer_dict
+    }
+
     /// Requests a piece directly without a torrent file.
     /// @param info_hash: The 20-byte info hash (hex string)
     /// @param peer_ip: The IP address (v4 or v6)

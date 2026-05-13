@@ -322,16 +322,41 @@ impl InfoTorrent {
     }
 
     #[func]
+    pub fn get_peer_bitfields(&self) -> VarDictionary {
+        let mut outer_dict = VarDictionary::new();
+        if let Ok(data) = crate::state::PEER_BITFIELDS.lock() {
+            for (peer_addr, hashes) in data.iter() {
+                let mut inner_dict = VarDictionary::new();
+                for (hash, bitfield) in hashes {
+                    let mut pba = PackedByteArray::new();
+                    for &byte in bitfield {
+                        pba.push(byte);
+                    }
+                    inner_dict.insert(GString::from(hash), pba);
+                }
+                outer_dict.insert(GString::from(peer_addr), inner_dict);
+            }
+        }
+        outer_dict
+    }
+
+    #[func]
     pub fn clear_peers(&self) -> GString {
         let global_cleared = crate::state::try_clear_global_ips();
         let mut peers_cleared = false;
+        let mut bitfields_cleared = false;
         
         if let Ok(mut peers) = crate::state::PEER_IPS.try_lock() {
             peers.clear();
             peers_cleared = true;
         }
+
+        if let Ok(mut bitfields) = crate::state::PEER_BITFIELDS.try_lock() {
+            bitfields.clear();
+            bitfields_cleared = true;
+        }
         
-        if global_cleared && peers_cleared {
+        if global_cleared && peers_cleared && bitfields_cleared {
             "ok".into()
         } else {
             "await".into()

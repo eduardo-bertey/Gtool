@@ -217,6 +217,14 @@ func dowload(ip , port):
 		int(info_torrent.get_total_size()),    # tamaño TOTAL del torrent
 		info_torrent.get_piece_hash(piece_idx)
 	)
+	if data.size() > 0:
+		var bytes = PackedByteArray(data)
+		var texto = bytes.get_string_from_utf8()
+		print("✅ ¡Éxito! Recibida pieza 0 desde localhost (", data.size(), " bytes)")
+		prints("longotud del texto : ",texto.length())
+	else:
+		print("❌ Falló la descarga desde localhost. Revisa el puerto y que el cliente de torrent esté abierto.")
+	
 
 func test_localhost(port: int):
 	if not info_torrent.is_loaded():
@@ -237,10 +245,45 @@ func test_localhost(port: int):
 	)
 	
 	if data.size() > 0:
+		var bytes = PackedByteArray(data)
+		var texto = bytes.get_string_from_utf8()
 		print("✅ ¡Éxito! Recibida pieza 0 desde localhost (", data.size(), " bytes)")
-		prints(data)
+		#prints(texto)
+		prints("longotud del texto : ",texto.length())
 	else:
 		print("❌ Falló la descarga desde localhost. Revisa el puerto y que el cliente de torrent esté abierto.")
+	
+	# Mostramos los bitfields capturados durante la conexión
+	imprimir_bitfields()
+
+func imprimir_bitfields():
+	var bitfields = info_torrent.get_peer_bitfields()
+	print("\n--- 🧩 ESTADO DE PIEZAS POR PEER (Bitfields) ---")
+	if bitfields.is_empty():
+		print("No hay bitfields registrados. ¿El peer envió el mensaje de bitfield?")
+		return
+		
+	for peer_addr in bitfields:
+		var torrents = bitfields[peer_addr]
+		for info_hash in torrents:
+			var bf_data = torrents[info_hash]
+			var piezas_listo = decodificar_bitfield(bf_data, info_torrent.get_piece_count())
+			print("📍 Peer: ", peer_addr)
+			print("   Hash: ", info_hash)
+			print("   Piezas Disponibles (", piezas_listo.size(), "/", info_torrent.get_piece_count(), "): ", piezas_listo)
+			if piezas_listo.size() > 0:
+				$panel.text += "\nPeer " + peer_addr + " tiene " + str(piezas_listo.size()) + " piezas."
+
+func decodificar_bitfield(bitfield: PackedByteArray, total_pieces: int) -> Array:
+	var pieces = []
+	for i in range(total_pieces):
+		var byte_index = i / 8
+		var bit_index = 7 - (i % 8) # BitTorrent usa big-endian para los bits dentro del byte
+		
+		if byte_index < bitfield.size():
+			if (bitfield[byte_index] >> bit_index) & 1:
+				pieces.append(i)
+	return pieces
 
 func _on_exit_pressed() -> void:
 	queue_free()

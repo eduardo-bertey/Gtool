@@ -24,6 +24,11 @@ pub static PEER_IPS: Lazy<Mutex<HashMap<String, Vec<String>>>> = Lazy::new(|| {
     Mutex::new(HashMap::new())
 });
 
+// Diccionario: peer_addr -> { info_hash -> bitfield }
+pub static PEER_BITFIELDS: Lazy<Mutex<HashMap<String, HashMap<String, Vec<u8>>>>> = Lazy::new(|| {
+    Mutex::new(HashMap::new())
+});
+
 pub fn add_global_peer(address: String) {
     if let Ok(mut ips) = GLOBAL_IPS.lock() {
         if !ips.contains(&address) {
@@ -35,6 +40,13 @@ pub fn add_global_peer(address: String) {
 pub fn add_peer_address(id: String, address: String) {
     if let Ok(mut peers) = PEER_IPS.lock() {
         peers.entry(id).or_insert_with(Vec::new).push(address);
+    }
+}
+
+pub fn update_peer_bitfield(peer_addr: String, info_hash: String, bitfield: Vec<u8>) {
+    if let Ok(mut data) = PEER_BITFIELDS.lock() {
+        let peer_map = data.entry(peer_addr).or_insert_with(HashMap::new);
+        peer_map.insert(info_hash, bitfield);
     }
 }
 
