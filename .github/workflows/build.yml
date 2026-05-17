@@ -27,6 +27,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             bin: Gtool.dll
             final_name: Gtool.dll
+            rustflags: "-C target-feature=+crt-static"
 
           - runner: macos-latest
             target: x86_64-apple-darwin
@@ -73,6 +74,8 @@ jobs:
 
       - name: Build rust binary
         if: "!contains(matrix.target, 'android')"
+        env:
+          RUSTFLAGS: ${{ matrix.rustflags }}
         run: cargo build --verbose --locked --release --target ${{ matrix.target }}
 
       - name: Build rust binary for android
