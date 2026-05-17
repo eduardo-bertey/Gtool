@@ -8,7 +8,7 @@ extends XLSTMLargeChat
 @onready var train_button: Button = $"../VBoxContainer/HBoxContainer/TrainBtn"
 
 func _ready() -> void:
-	DisplayServer.pip_mode_set_auto_enter_on_background(true)
+	#DisplayServer.pip_mode_set_auto_enter_on_background(true)
 
 	gen_button.pressed.connect(_on_generate_pressed)
 	train_button.pressed.connect(_on_train_pressed)

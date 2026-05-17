@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://cb5d2c2d2e2f2"]
+
+[ext_resource type="Script" uid="uid://dr6svsftcmv5r" path="res://example_godot/unarc_test/example_unarc.gd" id="1_script"]
+
+[node name="ExampleUnarc" type="Control" unique_id=1703873107]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Label" type="RichTextLabel" parent="." unique_id=513193067]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 100.0
+offset_right = -50.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 18
+text = "Resultados unarc aparecerán aquí..."
+
+[node name="test" type="Button" parent="." unique_id=1627370894]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 20.0
+offset_right = 280.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 20
+text = "Crear y Probar ZIP"
+
+[node name="exit" type="Button" parent="." unique_id=1195970319]
+layout_mode = 0
+offset_left = 900.0
+offset_top = 20.0
+offset_right = 1050.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 20
+text = "Salir"
+
+[connection signal="pressed" from="test" to="." method="_on_test_pressed"]
+[connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]

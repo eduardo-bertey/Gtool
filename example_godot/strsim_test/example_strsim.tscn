@@ -1,9 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://d1g5g2j2g2g2g"]
+[gd_scene format=3 uid="uid://d1g5g2j2g2g2g"]
 
-[ext_resource type="Script" path="res://example_godot/strsim_test/example_strsim.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://dr6svsftcmv5q" path="res://example_godot/strsim_test/example_strsim.gd" id="1_script"]
 
-
-[node name="ExampleStrsim" type="Control"]
+[node name="ExampleStrsim" type="Control" unique_id=1703873106]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,15 +11,50 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=513193066]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
+offset_left = 400.0
 offset_top = 20.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 24
 text = "Resultados strsim aparecerán aquí..."
 
+[node name="LineEdit" type="LineEdit" parent="." unique_id=1599341605]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 40.0
+offset_right = 350.0
+offset_bottom = 80.0
+placeholder_text = "Escribe para buscar (ej. menu)..."
+
+[node name="ItemList" type="ItemList" parent="." unique_id=1487152255]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 85.0
+offset_right = 350.0
+offset_bottom = 350.0
+
+[node name="test" type="Button" parent="." unique_id=1627370893]
+layout_mode = 0
+offset_left = 911.0
+offset_top = 7.0
+offset_right = 1016.0
+offset_bottom = 66.0
+text = "tests"
+
+[node name="exit" type="Button" parent="." unique_id=1195970318]
+layout_mode = 0
+offset_left = 1036.0
+offset_top = 7.0
+offset_right = 1129.0
+offset_bottom = 66.0
+text = "exit"
+
+[connection signal="text_changed" from="LineEdit" to="." method="_on_line_edit_text_changed"]
+[connection signal="item_selected" from="ItemList" to="." method="_on_item_list_item_selected"]
+[connection signal="pressed" from="test" to="." method="_on_test_pressed"]
+[connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]
