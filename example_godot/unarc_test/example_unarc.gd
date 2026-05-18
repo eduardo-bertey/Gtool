@@ -75,5 +75,8 @@ func _on_test_pressed() -> void:
 	else:
 		$Label.text += "   Error: Falló la extracción con unarc-rs.\n"
 
+func _on_advanced_pressed() -> void:
+	get_tree().change_scene_to_file("res://example_godot/unarc_test/advanced_unarc.tscn")
+
 func _on_exit_pressed() -> void:
 	self.queue_free()

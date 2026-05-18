@@ -101,6 +101,18 @@ layout_mode = 2
 text = "itorren"
 script = ExtResource("12_lmec7")
 
+[node name="Button" type="Button" parent="TabContainer" unique_id=2127318222]
+layout_mode = 2
+text = "kem"
+
+[node name="Button2" type="Button" parent="TabContainer" unique_id=764467060]
+layout_mode = 2
+text = "strsim"
+
+[node name="compr" type="Button" parent="TabContainer" unique_id=1706877814]
+layout_mode = 2
+text = "comp"
+
 [node name="TextEdit" type="TextEdit" parent="." unique_id=1028781057]
 layout_mode = 0
 offset_left = 220.0
@@ -138,3 +150,4 @@ tab_input_mode = false
 [connection signal="pressed" from="TabContainer/minrnn" to="." method="_on_minrnn_pressed"]
 [connection signal="mouse_entered" from="TabContainer/itorrent" to="TabContainer/itorrent" method="_on_mouse_entered"]
 [connection signal="pressed" from="TabContainer/itorrent" to="." method="_on_itorrent_pressed"]
+[connection signal="pressed" from="TabContainer/compr" to="." method="_on_compr_pressed"]

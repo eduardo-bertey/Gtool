@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cb5d2c2d2e2f2"]
 
-[ext_resource type="Script" uid="uid://dr6svsftcmv5r" path="res://example_godot/unarc_test/example_unarc.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://brwdig4vm5df4" path="res://example_godot/unarc_test/example_unarc.gd" id="1_script"]
 
 [node name="ExampleUnarc" type="Control" unique_id=1703873107]
 layout_mode = 3
@@ -10,6 +10,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=676451057]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32941177, 0.2901961, 1, 1)
 
 [node name="Label" type="RichTextLabel" parent="." unique_id=513193067]
 layout_mode = 1
@@ -34,6 +43,15 @@ offset_bottom = 80.0
 theme_override_font_sizes/font_size = 20
 text = "Crear y Probar ZIP"
 
+[node name="advanced" type="Button" parent="." unique_id=1195970320]
+layout_mode = 0
+offset_left = 550.0
+offset_top = 20.0
+offset_right = 850.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 20
+text = "Explorar en RAM (Avanzado)"
+
 [node name="exit" type="Button" parent="." unique_id=1195970319]
 layout_mode = 0
 offset_left = 900.0
@@ -44,4 +62,5 @@ theme_override_font_sizes/font_size = 20
 text = "Salir"
 
 [connection signal="pressed" from="test" to="." method="_on_test_pressed"]
+[connection signal="pressed" from="advanced" to="." method="_on_advanced_pressed"]
 [connection signal="pressed" from="exit" to="." method="_on_exit_pressed"]

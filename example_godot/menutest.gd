@@ -98,3 +98,13 @@ func _on_itorrent_pressed() -> void:
 	
 	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
 	pass # Replace with function body.
+
+
+func _on_compr_pressed() -> void:
+	var data_exten = load("res://example_godot/unarc_test/example_unarc.tscn").instantiate()
+
+	self.add_child(data_exten)
+	
+	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
+	pass # Replace with function body.
+	pass # Replace with function body.

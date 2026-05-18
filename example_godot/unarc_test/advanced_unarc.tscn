@@ -1,0 +1,230 @@
+[gd_scene format=3 uid="uid://c5e3d7a8cac0d"]
+
+[ext_resource type="Script" path="res://example_godot/unarc_test/advanced_unarc.gd" id="1_script"]
+
+[node name="AdvancedUnarc" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.117647, 0.137255, 0.176471, 1)
+
+[node name="MainLayout" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 380
+
+[node name="Sidebar" type="VBoxContainer" parent="MainLayout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Explorador de Archivos en RAM"
+horizontal_alignment = 1
+
+[node name="PathSection" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MainLayout/Sidebar/PathSection"]
+layout_mode = 2
+text = "Ruta del archivo (.7z / .rar / .zip):"
+
+[node name="HBox" type="HBoxContainer" parent="MainLayout/Sidebar/PathSection"]
+layout_mode = 2
+
+[node name="FilePathInput" type="LineEdit" parent="MainLayout/Sidebar/PathSection/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Ruta o user://..."
+
+[node name="BrowseButton" type="Button" parent="MainLayout/Sidebar/PathSection/HBox"]
+layout_mode = 2
+text = "Buscar"
+
+[node name="PasswordSection" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MainLayout/Sidebar/PasswordSection"]
+layout_mode = 2
+text = "Contraseña (si es requerido):"
+
+[node name="PasswordInput" type="LineEdit" parent="MainLayout/Sidebar/PasswordSection"]
+layout_mode = 2
+secret = true
+placeholder_text = "Contraseña de descifrado (AES-256 / XOR)"
+
+[node name="FileListLabel" type="Label" parent="MainLayout/Sidebar"]
+layout_mode = 2
+text = "Archivos detectados en RAM:"
+
+[node name="FileList" type="ItemList" parent="MainLayout/Sidebar"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProgressSection" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="ProgressBar" type="ProgressBar" parent="MainLayout/Sidebar/ProgressSection"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="ActionButtons" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Row1" type="HBoxContainer" parent="MainLayout/Sidebar/ActionButtons"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LoadInRam" type="Button" parent="MainLayout/Sidebar/ActionButtons/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "Cargar en RAM"
+
+[node name="LoadFromDisk" type="Button" parent="MainLayout/Sidebar/ActionButtons/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "Cargar desde Disco"
+
+[node name="SimulateProgressive" type="Button" parent="MainLayout/Sidebar/ActionButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Simular Descarga por Partes"
+
+[node name="StatusLabel" type="Label" parent="MainLayout/Sidebar"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.462745, 0.733333, 0.898039, 1)
+autowrap_mode = 3
+
+[node name="HBox" type="HBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+
+[node name="Back" type="Button" parent="MainLayout/Sidebar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Volver a Prueba Básica"
+
+[node name="PreviewArea" type="VBoxContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PanelHeader" type="Panel" parent="MainLayout/PreviewArea"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/PreviewArea/PanelHeader"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_right = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="PreviewTitle" type="Label" parent="MainLayout/PreviewArea/PanelHeader/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "Visualizando: Ningún archivo seleccionado"
+vertical_alignment = 1
+
+[node name="ExtractToDiskButton" type="Button" parent="MainLayout/PreviewArea/PanelHeader/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "Volcar a Disco (Streaming)"
+
+[node name="PreviewPanel" type="Panel" parent="MainLayout/PreviewArea"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainLayout/PreviewArea/PreviewPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextPreview" type="RichTextLabel" parent="MainLayout/PreviewArea/PreviewPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 14
+text = "El contenido del archivo se mostrará aquí..."
+
+[node name="ImagePreview" type="TextureRect" parent="MainLayout/PreviewArea/PreviewPanel"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HexPreview" type="RichTextLabel" parent="MainLayout/PreviewArea/PreviewPanel"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 13
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Abrir archivo"
+ok_button_text = "Seleccionar"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.zip ; ZIP Archives", "*.7z ; 7z Archives", "*.rar ; RAR Archives")
+
+[connection signal="pressed" from="MainLayout/Sidebar/PathSection/HBox/BrowseButton" to="." method="_on_browse_button_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/ActionButtons/Row1/LoadInRam" to="." method="_on_load_in_ram_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/ActionButtons/Row1/LoadFromDisk" to="." method="_on_load_from_disk_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/ActionButtons/SimulateProgressive" to="." method="_on_simulate_progressive_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/HBox/Back" to="." method="_on_back_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
