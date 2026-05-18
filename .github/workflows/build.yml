@@ -81,8 +81,11 @@ jobs:
       - name: Build rust binary for android
         if: matrix.target == 'aarch64-linux-android'
         env:
-          RUSTFLAGS: "-C link-arg=-lc++_shared"
-        run: cargo ndk -t ${{ matrix.target }} --platform 34 build --release --verbose --locked
+          RUSTFLAGS: "-C link-arg=-lc++_shared -L target/pthread_mock"
+        run: |
+          mkdir -p target/pthread_mock
+          touch target/pthread_mock/libpthread.a
+          cargo ndk -t ${{ matrix.target }} --platform 34 build --release --verbose --locked
 
       - name: Rename binary to final_name
         shell: bash
