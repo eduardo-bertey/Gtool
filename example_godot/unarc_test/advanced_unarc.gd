@@ -177,11 +177,22 @@ func _on_load_from_disk_pressed() -> void:
 	extract_to_disk_btn.hide()
 	selected_entry_metadata.clear()
 	
+	# Comprobar si el archivo está protegido por contraseña antes de intentar cargarlo
+	var password = password_input.text
+	var requires_password = false
+	if detected_volumes.size() > 1:
+		requires_password = unarc.is_archive_encrypted_multi_volume(detected_volumes, current_format)
+	else:
+		requires_password = unarc.is_archive_encrypted(current_archive_path)
+		
+	if requires_password and password == "":
+		status_label.text = "[Advertencia] Este archivo requiere contraseña. Por favor, escribe la contraseña en el cuadro superior antes de cargar."
+		progress_bar.value = 0
+		return
+
 	# Listar entradas
 	if detected_volumes.size() > 1:
 		status_label.text = "Detectados %d volúmenes divididos en disco. Mapeando cabecera..." % detected_volumes.size()
-		# Usamos la nueva API Genérica Multi-Volumen de Rust
-		var password = password_input.text
 		current_file_entries = unarc.get_entries_multi_volume(detected_volumes, current_format, password)
 	else:
 		# Archivo de volumen único convencional o genérico
@@ -192,6 +203,10 @@ func _on_load_from_disk_pressed() -> void:
 		if detected_format != "" and detected_format != current_format:
 			status_label.text = "¡Formato genérico detectado! Abriendo como: %s" % detected_format.to_upper()
 			current_format = detected_format
+			
+		if password != "":
+			current_file_entries = unarc.get_entries_with_password(current_archive_path, password)
+		elif detected_format != "":
 			current_file_entries = unarc.get_entries_with_format(current_archive_path, current_format)
 		else:
 			current_file_entries = unarc.get_entries(current_archive_path)
@@ -361,11 +376,22 @@ func _on_extract_to_disk_pressed() -> void:
 			# Usamos la nueva API Genérica Multi-Volumen de Rust
 			success = unarc.extract_all_multi_volume(detected_volumes, current_format, global_output_path.get_base_dir(), password)
 		else:
-			if unarc.is_supported_archive(current_archive_path):
-				var detected_format = unarc.get_archive_format_name(current_archive_path).to_lower()
-				success = unarc.extract_entry_with_format(current_archive_path, entry_name, global_output_path, detected_format)
+			if password != "":
+				status_label.text = "Extrayendo archivo protegido con contraseña..."
+				var bytes = unarc.read_entry_bytes_with_password(current_archive_path, entry_name, password)
+				if bytes.size() > 0:
+					var dir = output_file_path.get_base_dir()
+					DirAccess.make_dir_recursive_absolute(dir)
+					var file = FileAccess.open(output_file_path, FileAccess.WRITE)
+					file.store_buffer(bytes)
+					file.close()
+					success = true
 			else:
-				success = unarc.extract_entry(current_archive_path, entry_name, global_output_path)
+				if unarc.is_supported_archive(current_archive_path):
+					var detected_format = unarc.get_archive_format_name(current_archive_path).to_lower()
+					success = unarc.extract_entry_with_format(current_archive_path, entry_name, global_output_path, detected_format)
+				else:
+					success = unarc.extract_entry(current_archive_path, entry_name, global_output_path)
 		
 	if success:
 		progress_bar.value = 100

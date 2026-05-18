@@ -1,0 +1,203 @@
+[gd_scene format=3 uid="uid://df7d8e9cacbd0"]
+
+[ext_resource type="Script" path="res://example_godot/visor_txt_hex/visor_txt_hex.gd" id="1_script"]
+
+[node name="VisorTxtHex" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101961, 0.117647, 0.14902, 1)
+
+[node name="MainLayout" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = 350
+
+[node name="Sidebar" type="VBoxContainer" parent="MainLayout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.392157, 0.588235, 0.941176, 1)
+theme_override_font_sizes/font_size = 22
+text = "Visor Hex & TXT Progresivo"
+horizontal_alignment = 1
+
+[node name="PathSection" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MainLayout/Sidebar/PathSection"]
+layout_mode = 2
+text = "Ruta del archivo a inspeccionar:"
+
+[node name="HBox" type="HBoxContainer" parent="MainLayout/Sidebar/PathSection"]
+layout_mode = 2
+
+[node name="FilePathInput" type="LineEdit" parent="MainLayout/Sidebar/PathSection/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Ruta o user://..."
+
+[node name="BrowseButton" type="Button" parent="MainLayout/Sidebar/PathSection/HBox"]
+layout_mode = 2
+text = "Buscar"
+
+[node name="ModeSection" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MainLayout/Sidebar/ModeSection"]
+layout_mode = 2
+text = "Modo de Visualización:"
+
+[node name="ModeSelector" type="OptionButton" parent="MainLayout/Sidebar/ModeSection"]
+layout_mode = 2
+item_count = 2
+selected = 1
+popup/item_0/text = "Texto Plano (UTF-8 / ASCII)"
+popup/item_0/id = 0
+popup/item_1/text = "Volcado Hexadecimal (Firma / Bytes)"
+popup/item_1/id = 1
+
+[node name="ChunkSection" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="MainLayout/Sidebar/ChunkSection"]
+layout_mode = 2
+text = "Tamaño de Bloque (KB):"
+
+[node name="ChunkSizeInput" type="LineEdit" parent="MainLayout/Sidebar/ChunkSection"]
+layout_mode = 2
+text = "4"
+placeholder_text = "Tamaño de Bloque en KB (ej: 4)"
+
+[node name="InfoPanel" type="Panel" parent="MainLayout/Sidebar"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+
+[node name="InfoText" type="RichTextLabel" parent="MainLayout/Sidebar/InfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/normal_font_size = 13
+text = "Metadata del archivo aparecerá aquí..."
+
+[node name="ActionButtons" type="VBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LoadBtn" type="Button" parent="MainLayout/Sidebar/ActionButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Cargar Archivo"
+
+[node name="NextBlockBtn" type="Button" parent="MainLayout/Sidebar/ActionButtons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Continuar (Cargar +4KB)"
+
+[node name="StatusLabel" type="Label" parent="MainLayout/Sidebar"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.462745, 0.733333, 0.898039, 1)
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+
+[node name="HBox" type="HBoxContainer" parent="MainLayout/Sidebar"]
+layout_mode = 2
+
+[node name="BackBtn" type="Button" parent="MainLayout/Sidebar/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Volver a unarc-rs"
+
+[node name="PreviewArea" type="VBoxContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="PanelHeader" type="Panel" parent="MainLayout/PreviewArea"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainLayout/PreviewArea/PanelHeader"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_right = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="PreviewTitle" type="Label" parent="MainLayout/PreviewArea/PanelHeader/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "Visualizando: Ningún archivo seleccionado"
+vertical_alignment = 1
+
+[node name="PreviewPanel" type="Panel" parent="MainLayout/PreviewArea"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MainLayout/PreviewArea/PreviewPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MainPreview" type="RichTextLabel" parent="MainLayout/PreviewArea/PreviewPanel/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 13
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Abrir archivo"
+ok_button_text = "Seleccionar"
+file_mode = 0
+access = 2
+
+[connection signal="pressed" from="MainLayout/Sidebar/PathSection/HBox/BrowseButton" to="." method="_on_browse_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/ActionButtons/LoadBtn" to="." method="_on_load_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/ActionButtons/NextBlockBtn" to="." method="_on_next_block_pressed"]
+[connection signal="pressed" from="MainLayout/Sidebar/HBox/BackBtn" to="." method="_on_back_pressed"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]

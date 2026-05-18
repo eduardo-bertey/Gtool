@@ -225,8 +225,66 @@ impl Unarc {
     }
 
     #[func]
-    pub fn get_entries_with_password(&mut self, archive_path: String, _password: String) -> Array<VarDictionary> {
-        self.get_entries(archive_path)
+    pub fn get_entries_with_password(&mut self, archive_path: String, password: String) -> Array<VarDictionary> {
+        let mut entries_array = Array::new();
+        let path = Path::new(&archive_path);
+        
+        if !path.exists() {
+            godot_warn!("El archivo no existe: {}", archive_path);
+            return entries_array;
+        }
+
+        let format = match ArchiveFormat::from_path(path) {
+            Some(fmt) => fmt,
+            None => {
+                godot_error!("No se pudo determinar el formato del archivo: {}", archive_path);
+                return entries_array;
+            }
+        };
+
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
+        match std::fs::File::open(path) {
+            Ok(file) => {
+                match format.open_with_options(file, options) {
+                    Ok(mut archive) => {
+                        loop {
+                            match archive.next_entry() {
+                                Ok(Some(entry)) => {
+                                    let mut dict = VarDictionary::new();
+                                    let name = entry.name().to_string();
+                                    let size = entry.original_size() as i64;
+                                    let is_dir = name.ends_with('/') || name.ends_with('\\');
+                                    
+                                    dict.insert("name", name);
+                                    dict.insert("size", size);
+                                    dict.insert("is_directory", is_dir);
+                                    entries_array.push(&dict);
+                                }
+                                Ok(None) => break,
+                                Err(e) => {
+                                    godot_error!("Error leyendo la entrada del archivo comprimido con contraseña: {:?}", e);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        godot_error!("No se pudo abrir el lector de formato para {} con contraseña: {:?}", archive_path, e);
+                    }
+                }
+            }
+            Err(e) => {
+                godot_error!("No se pudo abrir el archivo físico {} con contraseña: {:?}", archive_path, e);
+            }
+        }
+
+        self.entries_list = entries_array.clone();
+        entries_array
     }
 
     #[func]
