@@ -65,9 +65,15 @@ impl Unarc {
         entries_array
     }
 
-    // Extrae todo el archivo comprimido a una carpeta destino
+    // Extrae todo el archivo comprimido a una carpeta destino (sin contraseña)
     #[func]
     pub fn extract_all(&self, archive_path: String, output_dir: String) -> bool {
+        self.extract_all_with_password(archive_path, output_dir, String::new())
+    }
+
+    // Extrae todo el archivo comprimido a una carpeta destino (soporta contraseña opcional)
+    #[func]
+    pub fn extract_all_with_password(&self, archive_path: String, output_dir: String, password: String) -> bool {
         let path = Path::new(&archive_path);
         if !path.exists() {
             godot_warn!("El archivo no existe: {}", archive_path);
@@ -80,103 +86,166 @@ impl Unarc {
             return false;
         }
 
-        match ArchiveFormat::open_path(path) {
-            Ok(mut archive) => {
-                loop {
-                    match archive.next_entry() {
-                        Ok(Some(entry)) => {
-                            let entry_name = entry.name();
-                            let target_path = out_dir.join(entry_name);
+        let format = match ArchiveFormat::from_path(path) {
+            Some(fmt) => fmt,
+            None => {
+                godot_error!("No se pudo determinar el formato del archivo para extracción: {}", archive_path);
+                return false;
+            }
+        };
 
-                            if entry_name.ends_with('/') || entry_name.ends_with('\\') {
-                                if let Err(e) = std::fs::create_dir_all(&target_path) {
-                                    godot_error!("No se pudo crear el directorio {:?}: {:?}", target_path, e);
-                                    return false;
-                                }
-                            } else {
-                                if let Some(parent) = target_path.parent() {
-                                    if let Err(e) = std::fs::create_dir_all(parent) {
-                                        godot_error!("No se pudo crear el directorio padre {:?}: {:?}", parent, e);
-                                        return false;
-                                    }
-                                }
-                                match std::fs::File::create(&target_path) {
-                                    Ok(mut out_file) => {
-                                        if let Err(e) = archive.read_to(&entry, &mut out_file) {
-                                            godot_error!("Error escribiendo flujo al archivo {:?}: {:?}", target_path, e);
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
+        match std::fs::File::open(path) {
+            Ok(file) => {
+                match format.open_with_options(file, options) {
+                    Ok(mut archive) => {
+                        loop {
+                            match archive.next_entry() {
+                                Ok(Some(entry)) => {
+                                    let entry_name = entry.name();
+                                    let target_path = out_dir.join(entry_name);
+
+                                    if entry_name.ends_with('/') || entry_name.ends_with('\\') {
+                                        if let Err(e) = std::fs::create_dir_all(&target_path) {
+                                            godot_error!("No se pudo crear el directorio {:?}: {:?}", target_path, e);
                                             return false;
                                         }
+                                    } else {
+                                        if let Some(parent) = target_path.parent() {
+                                            if let Err(e) = std::fs::create_dir_all(parent) {
+                                                godot_error!("No se pudo crear el directorio padre {:?}: {:?}", parent, e);
+                                                return false;
+                                            }
+                                        }
+                                        match std::fs::File::create(&target_path) {
+                                            Ok(mut out_file) => {
+                                                let res = if password.is_empty() {
+                                                    archive.read_to(&entry, &mut out_file)
+                                                } else {
+                                                    let read_opts = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
+                                                    archive.read_to_with_options(&entry, &mut out_file, &read_opts)
+                                                };
+
+                                                if let Err(e) = res {
+                                                    godot_error!("Error escribiendo flujo al archivo {:?}: {:?}", target_path, e);
+                                                    return false;
+                                                }
+                                            }
+                                            Err(e) => {
+                                                godot_error!("No se pudo crear el archivo {:?}: {:?}", target_path, e);
+                                                return false;
+                                            }
+                                        }
                                     }
-                                    Err(e) => {
-                                        godot_error!("No se pudo crear el archivo {:?}: {:?}", target_path, e);
-                                        return false;
-                                    }
+                                }
+                                Ok(None) => break,
+                                Err(e) => {
+                                    godot_error!("Error iterando entradas: {:?}", e);
+                                    return false;
                                 }
                             }
                         }
-                        Ok(None) => break,
-                        Err(e) => {
-                            godot_error!("Error iterando entradas: {:?}", e);
-                            return false;
-                        }
+                        true
+                    }
+                    Err(e) => {
+                        godot_error!("No se pudo abrir el lector de formato para {}: {:?}", archive_path, e);
+                        false
                     }
                 }
-                true
             }
             Err(e) => {
-                godot_error!("No se pudo abrir el archivo comprimido: {:?}", e);
+                godot_error!("No se pudo abrir el archivo físico {}: {:?}", archive_path, e);
                 false
             }
         }
     }
 
-    // Extrae una sola entrada del archivo a una ruta específica
+    // Extrae una sola entrada del archivo a una ruta específica (sin contraseña)
     #[func]
     pub fn extract_entry(&self, archive_path: String, entry_name: String, dest_path: String) -> bool {
+        self.extract_entry_with_password(archive_path, entry_name, dest_path, String::new())
+    }
+
+    // Extrae una sola entrada del archivo a una ruta específica (soporta contraseña opcional)
+    #[func]
+    pub fn extract_entry_with_password(&self, archive_path: String, entry_name: String, dest_path: String, password: String) -> bool {
         let path = Path::new(&archive_path);
         if !path.exists() {
             godot_warn!("El archivo no existe: {}", archive_path);
             return false;
         }
 
-        match ArchiveFormat::open_path(path) {
-            Ok(mut archive) => {
-                loop {
-                    match archive.next_entry() {
-                        Ok(Some(entry)) => {
-                            if entry.name() == entry_name {
-                                if let Some(parent) = Path::new(&dest_path).parent() {
-                                    if let Err(e) = std::fs::create_dir_all(parent) {
-                                        godot_error!("No se pudo crear el directorio {:?}: {:?}", parent, e);
-                                        return false;
+        let format = match ArchiveFormat::from_path(path) {
+            Some(fmt) => fmt,
+            None => {
+                godot_error!("No se pudo determinar el formato del archivo para extracción individual: {}", archive_path);
+                return false;
+            }
+        };
+
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
+        match std::fs::File::open(path) {
+            Ok(file) => {
+                match format.open_with_options(file, options) {
+                    Ok(mut archive) => {
+                        loop {
+                            match archive.next_entry() {
+                                Ok(Some(entry)) => {
+                                    if entry.name() == entry_name {
+                                        if let Some(parent) = Path::new(&dest_path).parent() {
+                                            if let Err(e) = std::fs::create_dir_all(parent) {
+                                                godot_error!("No se pudo crear el directorio {:?}: {:?}", parent, e);
+                                                return false;
+                                            }
+                                        }
+                                        match std::fs::File::create(&dest_path) {
+                                            Ok(mut out_file) => {
+                                                let res = if password.is_empty() {
+                                                    archive.read_to(&entry, &mut out_file)
+                                                } else {
+                                                    let read_opts = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
+                                                    archive.read_to_with_options(&entry, &mut out_file, &read_opts)
+                                                };
+
+                                                if let Err(e) = res {
+                                                    godot_error!("Error escribiendo flujo al archivo {}: {:?}", dest_path, e);
+                                                    return false;
+                                                }
+                                                return true;
+                                            }
+                                            Err(e) => {
+                                                godot_error!("No se pudo crear el archivo {}: {:?}", dest_path, e);
+                                                return false;
+                                            }
+                                        }
                                     }
                                 }
-                                match std::fs::File::create(&dest_path) {
-                                    Ok(mut out_file) => {
-                                        if let Err(e) = archive.read_to(&entry, &mut out_file) {
-                                            godot_error!("Error escribiendo flujo al archivo {}: {:?}", dest_path, e);
-                                            return false;
-                                        }
-                                        return true;
-                                    }
-                                    Err(e) => {
-                                        godot_error!("No se pudo crear el archivo {}: {:?}", dest_path, e);
-                                        return false;
-                                    }
+                                Ok(None) => break,
+                                Err(e) => {
+                                    godot_error!("Error iterando entradas: {:?}", e);
+                                    break;
                                 }
                             }
                         }
-                        Ok(None) => break,
-                        Err(e) => {
-                            godot_error!("Error iterando entradas: {:?}", e);
-                            break;
-                        }
+                        godot_warn!("Entrada no encontrada en el archivo: {}", entry_name);
+                    }
+                    Err(e) => {
+                        godot_error!("No se pudo abrir el lector de formato para {}: {:?}", archive_path, e);
                     }
                 }
-                godot_warn!("Entrada no encontrada en el archivo: {}", entry_name);
             }
             Err(e) => {
-                godot_error!("No se pudo abrir el archivo comprimido: {:?}", e);
+                godot_error!("No se pudo abrir el archivo físico {}: {:?}", archive_path, e);
             }
         }
         false
@@ -295,41 +364,56 @@ impl Unarc {
             return PackedByteArray::new();
         }
 
-        match ArchiveFormat::open_path(path) {
-            Ok(mut archive) => {
-                loop {
-                    match archive.next_entry() {
-                        Ok(Some(entry)) => {
-                            if entry.name() == entry_name {
-                                let res = if password.is_empty() {
-                                    archive.read(&entry)
-                                } else {
-                                    let options = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
-                                    archive.read_with_options(&entry, &options)
-                                };
+        let format = match ArchiveFormat::from_path(path) {
+            Some(fmt) => fmt,
+            None => {
+                godot_error!("No se pudo determinar el formato del archivo: {}", archive_path);
+                return PackedByteArray::new();
+            }
+        };
 
-                                match res {
-                                    Ok(data) => {
-                                        return PackedByteArray::from_iter(data);
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
+        match std::fs::File::open(path) {
+            Ok(file) => {
+                match format.open_with_options(file, options) {
+                    Ok(mut archive) => {
+                        loop {
+                            match archive.next_entry() {
+                                Ok(Some(entry)) => {
+                                    if entry.name() == entry_name {
+                                        let options_for_read = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
+                                        match archive.read_with_options(&entry, &options_for_read) {
+                                            Ok(data) => {
+                                                return PackedByteArray::from_iter(data);
+                                            }
+                                            Err(e) => {
+                                                godot_error!("Error leyendo la entrada {} con contraseña: {:?}", entry_name, e);
+                                                return PackedByteArray::new();
+                                            }
+                                        }
                                     }
-                                    Err(e) => {
-                                        godot_error!("Error leyendo la entrada {} con contraseña: {:?}", entry_name, e);
-                                        return PackedByteArray::new();
-                                    }
+                                }
+                                Ok(None) => break,
+                                Err(e) => {
+                                    godot_error!("Error iterando entradas: {:?}", e);
+                                    break;
                                 }
                             }
                         }
-                        Ok(None) => break,
-                        Err(e) => {
-                            godot_error!("Error iterando entradas: {:?}", e);
-                            break;
-                        }
+                        godot_warn!("Entrada no encontrada en el archivo: {}", entry_name);
+                    }
+                    Err(e) => {
+                        godot_error!("No se pudo abrir el lector de formato para {} con contraseña: {:?}", archive_path, e);
                     }
                 }
-                godot_warn!("Entrada no encontrada en el archivo: {}", entry_name);
             }
             Err(e) => {
-                godot_error!("No se pudo abrir el archivo comprimido: {:?}", e);
+                godot_error!("No se pudo abrir el archivo físico: {:?}", e);
             }
         }
         PackedByteArray::new()
@@ -337,6 +421,11 @@ impl Unarc {
 
     #[func]
     pub fn get_entries_from_bytes(&mut self, archive_bytes: PackedByteArray, format_extension: String) -> Array<VarDictionary> {
+        self.get_entries_from_bytes_with_password(archive_bytes, format_extension, String::new())
+    }
+
+    #[func]
+    pub fn get_entries_from_bytes_with_password(&mut self, archive_bytes: PackedByteArray, format_extension: String, password: String) -> Array<VarDictionary> {
         let mut entries_array = Array::new();
         let bytes = archive_bytes.to_vec();
         let cursor = std::io::Cursor::new(bytes);
@@ -350,7 +439,13 @@ impl Unarc {
             }
         };
 
-        match format.open(cursor) {
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
+        match format.open_with_options(cursor, options) {
             Ok(mut archive) => {
                 loop {
                     match archive.next_entry() {
@@ -396,18 +491,20 @@ impl Unarc {
             }
         };
 
-        match format.open(cursor) {
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
+        match format.open_with_options(cursor, options) {
             Ok(mut archive) => {
                 loop {
                     match archive.next_entry() {
                         Ok(Some(entry)) => {
                             if entry.name() == entry_name {
-                                let res = if password.is_empty() {
-                                    archive.read(&entry)
-                                } else {
-                                    let options = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
-                                    archive.read_with_options(&entry, &options)
-                                };
+                                let options_for_read = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
+                                let res = archive.read_with_options(&entry, &options_for_read);
                                 
                                 match res {
                                     Ok(data) => {
@@ -494,9 +591,15 @@ impl Unarc {
         extracted_dict
     }
 
-    // LISTAR entradas de un archivo de varios volúmenes (split: .7z.001, .7z.002, .zip, .z01, etc.)
+    // LISTAR entradas de un archivo de varios volúmenes (split: .7z.001, .7z.002, .zip, .z01, etc.) sin contraseña
     #[func]
-    pub fn get_entries_multi_volume(&mut self, paths: Array<GString>, format_extension: String, password: String) -> Array<VarDictionary> {
+    pub fn get_entries_multi_volume(&mut self, paths: Array<GString>, format_extension: String) -> Array<VarDictionary> {
+        self.get_entries_multi_volume_with_password(paths, format_extension, String::new())
+    }
+
+    // LISTAR entradas de un archivo de varios volúmenes con contraseña
+    #[func]
+    pub fn get_entries_multi_volume_with_password(&mut self, paths: Array<GString>, format_extension: String, password: String) -> Array<VarDictionary> {
         if paths.is_empty() {
             return Array::new();
         }
@@ -539,9 +642,15 @@ impl Unarc {
         entries_array
     }
 
-    // EXTRAER un archivo de varios volúmenes (split: .7z.001, .7z.002, .zip, .z01, etc.)
+    // EXTRAER un archivo de varios volúmenes sin contraseña
     #[func]
-    pub fn extract_all_multi_volume(&self, paths: Array<GString>, format_extension: String, output_dir: String, password: String) -> bool {
+    pub fn extract_all_multi_volume(&self, paths: Array<GString>, format_extension: String, output_dir: String) -> bool {
+        self.extract_all_multi_volume_with_password(paths, format_extension, output_dir, String::new())
+    }
+
+    // EXTRAER un archivo de varios volúmenes con contraseña
+    #[func]
+    pub fn extract_all_multi_volume_with_password(&self, paths: Array<GString>, format_extension: String, output_dir: String, password: String) -> bool {
         if paths.is_empty() {
             return false;
         }
@@ -725,10 +834,16 @@ impl Unarc {
         entries_array
     }
 
-    // Extrae todo el archivo comprimido especificando su formato manualmente
+    // Extrae todo el archivo comprimido especificando su formato manualmente (sin contraseña)
     // (Útil para archivos con extensiones genéricas como .dat, .bin, o sin extensión)
     #[func]
     pub fn extract_all_with_format(&self, archive_path: String, output_dir: String, format_extension: String) -> bool {
+        self.extract_all_with_format_and_password(archive_path, output_dir, format_extension, String::new())
+    }
+
+    // Extrae todo el archivo comprimido especificando su formato manualmente (soporta contraseña)
+    #[func]
+    pub fn extract_all_with_format_and_password(&self, archive_path: String, output_dir: String, format_extension: String, password: String) -> bool {
         let path = Path::new(&archive_path);
         if !path.exists() {
             godot_warn!("El archivo no existe: {}", archive_path);
@@ -750,9 +865,15 @@ impl Unarc {
             }
         };
 
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
         match std::fs::File::open(path) {
             Ok(file) => {
-                match format.open(file) {
+                match format.open_with_options(file, options) {
                     Ok(mut archive) => {
                         loop {
                             match archive.next_entry() {
@@ -774,7 +895,14 @@ impl Unarc {
                                         }
                                         match std::fs::File::create(&target_path) {
                                             Ok(mut out_file) => {
-                                                if let Err(e) = archive.read_to(&entry, &mut out_file) {
+                                                let res = if password.is_empty() {
+                                                    archive.read_to(&entry, &mut out_file)
+                                                } else {
+                                                    let read_opts = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
+                                                    archive.read_to_with_options(&entry, &mut out_file, &read_opts)
+                                                };
+
+                                                if let Err(e) = res {
                                                     godot_error!("Error escribiendo flujo al archivo {:?}: {:?}", target_path, e);
                                                     return false;
                                                 }
@@ -808,10 +936,15 @@ impl Unarc {
         }
     }
 
-    // Extrae una sola entrada del archivo a una ruta específica forzando el formato manualmente
-    // (Útil para archivos con extensiones genéricas como .dat, .bin, o sin extensión)
+    // Extrae una sola entrada del archivo a una ruta específica forzando el formato (sin contraseña)
     #[func]
     pub fn extract_entry_with_format(&self, archive_path: String, entry_name: String, dest_path: String, format_extension: String) -> bool {
+        self.extract_entry_with_format_and_password(archive_path, entry_name, dest_path, format_extension, String::new())
+    }
+
+    // Extrae una sola entrada del archivo a una ruta específica forzando el formato (soporta contraseña)
+    #[func]
+    pub fn extract_entry_with_format_and_password(&self, archive_path: String, entry_name: String, dest_path: String, format_extension: String, password: String) -> bool {
         let path = Path::new(&archive_path);
         if !path.exists() {
             godot_warn!("El archivo no existe: {}", archive_path);
@@ -827,9 +960,15 @@ impl Unarc {
             }
         };
 
+        let options = if password.is_empty() {
+            unarc_rs::unified::ArchiveOptions::new()
+        } else {
+            unarc_rs::unified::ArchiveOptions::new().with_password(&password)
+        };
+
         match std::fs::File::open(path) {
             Ok(file) => {
-                match format.open(file) {
+                match format.open_with_options(file, options) {
                     Ok(mut archive) => {
                         loop {
                             match archive.next_entry() {
@@ -843,7 +982,14 @@ impl Unarc {
                                         }
                                         match std::fs::File::create(&dest_path) {
                                             Ok(mut out_file) => {
-                                                if let Err(e) = archive.read_to(&entry, &mut out_file) {
+                                                let res = if password.is_empty() {
+                                                    archive.read_to(&entry, &mut out_file)
+                                                } else {
+                                                    let read_opts = unarc_rs::unified::ArchiveOptions::new().with_password(&password);
+                                                    archive.read_to_with_options(&entry, &mut out_file, &read_opts)
+                                                };
+
+                                                if let Err(e) = res {
                                                     godot_error!("Error escribiendo flujo al archivo {}: {:?}", dest_path, e);
                                                     return false;
                                                 }

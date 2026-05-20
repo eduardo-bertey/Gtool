@@ -125,8 +125,12 @@ func _list_files_from_ram() -> void:
 	extract_to_disk_btn.hide()
 	selected_entry_metadata.clear()
 	
-	# Usamos get_entries_from_bytes expuesto desde Rust para parsear la cabecera en RAM
-	current_file_entries = unarc.get_entries_from_bytes(current_archive_bytes, current_format)
+	# Usamos la API de memoria de Rust correspondiente según haya contraseña o no
+	var password = password_input.text
+	if password != "":
+		current_file_entries = unarc.get_entries_from_bytes_with_password(current_archive_bytes, current_format, password)
+	else:
+		current_file_entries = unarc.get_entries_from_bytes(current_archive_bytes, current_format)
 	
 	if current_file_entries.size() == 0:
 		status_label.text = "[Error] No se encontraron entradas en RAM. ¿El archivo está encriptado?"
@@ -448,7 +452,12 @@ func _on_simulate_progressive_pressed() -> void:
 			i, progress, downloaded_bytes / 1024, total_size / 1024
 		]
 		
-		var temp_entries = unarc.get_entries_from_bytes(current_archive_bytes, current_format)
+		var password = password_input.text
+		var temp_entries
+		if password != "":
+			temp_entries = unarc.get_entries_from_bytes_with_password(current_archive_bytes, current_format, password)
+		else:
+			temp_entries = unarc.get_entries_from_bytes(current_archive_bytes, current_format)
 		if temp_entries.size() > 0 and file_list.get_item_count() == 0:
 			status_label.text += " | ¡Cabecera descifrada en vivo en parte %d!" % i
 			for entry in temp_entries:
