@@ -24,6 +24,7 @@ var current_file_entries: Array = []
 var active_mode: String = "none" # "ram", "disk", "progressive"
 var selected_entry_metadata: Dictionary = {}
 var detected_volumes: Array[String] = [] # Almacena todas las partes si es multi-volumen
+var _multi_volume_fallback_flag: bool = false
 
 func _ready() -> void:
 	status_label.text = "Selecciona un archivo .7z, .rar o .zip. Carga desde Disco (Recomendado para archivos pesados >100MB) o desde RAM."
@@ -86,6 +87,7 @@ func _detect_multi_volumes(first_part_path: String) -> Array[String]:
 	
 	# Ordenar los volúmenes de manera ascendente (.001, .002, etc.)
 	volumes.sort()
+	prints(volumes)
 	return volumes
 
 # MODO 1: CARGAR TODO EN RAM (Para archivos únicos pequeños)
@@ -171,6 +173,13 @@ func _on_load_from_disk_pressed() -> void:
 		current_format = "7z"
 	elif current_format.is_valid_int() and path.to_lower().contains(".zip."):
 		current_format = "zip"
+
+	# Si se detectó un multi-volumen, usar el formato real de las partes
+	if detected_volumes.size() > 1:
+		var volume_format = obtener_formato(detected_volumes)
+		if volume_format != "":
+			current_format = volume_format
+			print("Formato multi-volumen detectado: ", current_format)
 		
 	status_label.text = "Explorando directo desde el disco (Cero consumo de RAM)..."
 	progress_bar.value = 50
@@ -194,27 +203,37 @@ func _on_load_from_disk_pressed() -> void:
 		progress_bar.value = 0
 		return
 
+	var detected_format = ""
+	if unarc.is_supported_archive(current_archive_path):
+		detected_format = unarc.get_archive_format_name(current_archive_path).to_lower()
+		
+	if detected_format != "" and detected_format != current_format:
+		status_label.text = "¡Formato genérico detectado! Abriendo como: %s" % detected_format.to_upper()
+		current_format = detected_format
+	prints(detected_format , "formato automatico")
+	prints(obtener_formato(detected_volumes) , "formato gdscript")
 	# Listar entradas
 	if detected_volumes.size() > 1:
 		status_label.text = "Detectados %d volúmenes divididos en disco. Mapeando cabecera..." % detected_volumes.size()
-		current_file_entries = unarc.get_entries_multi_volume(detected_volumes, current_format, password)
+		current_file_entries = unarc.get_entries_multi_volume_with_password(detected_volumes, obtener_formato(detected_volumes), password)
 	else:
 		# Archivo de volumen único convencional o genérico
-		var detected_format = ""
-		if unarc.is_supported_archive(current_archive_path):
-			detected_format = unarc.get_archive_format_name(current_archive_path).to_lower()
-			
-		if detected_format != "" and detected_format != current_format:
-			status_label.text = "¡Formato genérico detectado! Abriendo como: %s" % detected_format.to_upper()
-			current_format = detected_format
-			
-		if password != "":
+		if password != "" and detected_format != "" and unarc.has_method("get_entries_with_format_and_password"):
+			current_file_entries = unarc.get_entries_with_format_and_password(current_archive_path, detected_format, password)
+		elif password != "":
 			current_file_entries = unarc.get_entries_with_password(current_archive_path, password)
-		elif detected_format != "":
-			current_file_entries = unarc.get_entries_with_format(current_archive_path, current_format)
+			if current_file_entries.size() == 0 and detected_format == "" and unarc.has_method("get_entries_with_format_and_password"):
+				current_file_entries = unarc.get_entries_with_format_and_password(current_archive_path, "7z", password)
+				if current_file_entries.size() > 0:
+					current_format = "7z"
+		elif detected_format != "" and unarc.has_method("get_entries_with_format"):
+			current_file_entries = unarc.get_entries_with_format(current_archive_path, detected_format)
 		else:
 			current_file_entries = unarc.get_entries(current_archive_path)
-	
+			if current_file_entries.size() == 0 and unarc.has_method("get_entries_with_format"):
+				current_file_entries = unarc.get_entries_with_format(current_archive_path, "7z")
+				if current_file_entries.size() > 0:
+					current_format = "7z"
 	if current_file_entries.size() == 0:
 		status_label.text = "[Error] No se pudieron leer cabeceras. ¿Contraseña incorrecta o faltan partes?"
 		progress_bar.value = 0
@@ -225,6 +244,7 @@ func _on_load_from_disk_pressed() -> void:
 		var icon_text = "📁 " if entry["is_directory"] else "📄 "
 		var size_text = "" if entry["is_directory"] else " (%s)" % _format_size(entry["size"])
 		var item_idx = file_list.add_item(prefix + icon_text + entry["name"] + size_text)
+		#prints(entry["size"])
 		file_list.set_item_metadata(item_idx, entry)
 		
 	progress_bar.value = 100
@@ -249,13 +269,15 @@ func _on_file_item_selected(index: int) -> void:
 	preview_panel.show()
 	
 	var uncompressed_bytes = PackedByteArray()
-	
+	if entry["size"] > 1:
+		prints("estato : "  , entry["size"])
+		return
 	if active_mode == "ram" or active_mode == "progressive":
 		status_label.text = "Descomprimiendo en RAM: " + entry_name.get_file()
 		uncompressed_bytes = unarc.read_entry_bytes_from_bytes(
-			current_archive_bytes, 
-			entry_name, 
-			current_format, 
+			current_archive_bytes,
+			entry_name,
+			current_format,
 			password
 		)
 	else:
@@ -272,11 +294,16 @@ func _on_file_item_selected(index: int) -> void:
 			)
 		else:
 			status_label.text = "Descomprimiendo en RAM desde Disco: " + entry_name.get_file()
-			uncompressed_bytes = unarc.read_entry_bytes_with_password(
-				current_archive_path,
-				entry_name,
-				password
-			)
+			if password != "" and current_format in ["7z", "zip", "rar"] and unarc.has_method("read_entry_bytes_with_format_and_password"):
+				uncompressed_bytes = unarc.read_entry_bytes_with_format_and_password(current_archive_path, entry_name, current_format, password)
+			elif current_format in ["7z", "zip", "rar"] and unarc.has_method("read_entry_bytes_with_format"):
+				uncompressed_bytes = unarc.read_entry_bytes_with_format(current_archive_path, entry_name, current_format)
+			else:
+				uncompressed_bytes = unarc.read_entry_bytes_with_password(
+					current_archive_path,
+					entry_name,
+					password
+				)
 		
 	if uncompressed_bytes.size() == 0:
 		status_label.text = "[Error] No se pudo extraer la previsualización a RAM. ¿Contraseña incorrecta?"
@@ -372,28 +399,59 @@ func _on_extract_to_disk_pressed() -> void:
 			var file = FileAccess.open(output_file_path, FileAccess.WRITE)
 			file.store_buffer(bytes)
 			file.close()
+			prints("mal usa ram eso va abajo si no fuciona stream")
 			success = true
 	else:
 		# Modo Disco / Multi-volumen
+		prints("DEBUG volumes:", detected_volumes.size(), detected_volumes)
 		if detected_volumes.size() > 1:
-			status_label.text = "Extrayendo desde Multi-Volumen divididos directamente a disco..."
-			# Usamos la nueva API Genérica Multi-Volumen de Rust
-			success = unarc.extract_all_multi_volume(detected_volumes, current_format, global_output_path.get_base_dir(), password)
-		else:
-			if password != "":
-				status_label.text = "Extrayendo archivo protegido con contraseña..."
+			prints("multivoluen detectado")
+			var multi_volume_format = obtener_formato(detected_volumes)
+			if multi_volume_format == "":
+				multi_volume_format = current_format
+			if unarc.has_method("extract_entry_multi_volume_with_password"):
+				prints("extract mlti volumen con pass")
+				status_label.text = "Extrayendo desde Multi-Volumen con streaming directo a disco..."
+				_multi_volume_fallback_flag = false
+				success = unarc.extract_entry_multi_volume_with_password(detected_volumes, multi_volume_format, entry_name, global_output_path, password)
+			else:
+				prints("mal prsagio")
+				_multi_volume_fallback_flag = true
+				status_label.text = "[Warn] Streaming multi-volumen no disponible. Usando RAM como fallback..."
 				var bytes = unarc.read_entry_bytes_with_password(current_archive_path, entry_name, password)
 				if bytes.size() > 0:
 					var dir = output_file_path.get_base_dir()
 					DirAccess.make_dir_recursive_absolute(dir)
-					var file = FileAccess.open(output_file_path, FileAccess.WRITE)
+					var file = FileAccess.open(global_output_path, FileAccess.WRITE)
 					file.store_buffer(bytes)
 					file.close()
 					success = true
+		else:
+			_multi_volume_fallback_flag = false
+			if password != "":
+				status_label.text = "Extrayendo archivo protegido con contraseña..."
+				if current_format in ["7z", "zip", "rar"] and unarc.has_method("extract_entry_with_format_and_password"):
+					success = unarc.extract_entry_with_format_and_password(current_archive_path, entry_name, global_output_path, current_format, password)
+					prints("extracion bien")
+				else:
+					prints("extracionmal")
+					var bytes = unarc.read_entry_bytes_with_password(current_archive_path, entry_name, password)
+					if bytes.size() > 0:
+						var dir = output_file_path.get_base_dir()
+						DirAccess.make_dir_recursive_absolute(dir)
+						var file = FileAccess.open(output_file_path, FileAccess.WRITE)
+						file.store_buffer(bytes)
+						file.close()
+						success = true
 			else:
 				if unarc.is_supported_archive(current_archive_path):
 					var detected_format = unarc.get_archive_format_name(current_archive_path).to_lower()
-					success = unarc.extract_entry_with_format(current_archive_path, entry_name, global_output_path, detected_format)
+					if detected_format != "":
+						success = unarc.extract_entry_with_format(current_archive_path, entry_name, global_output_path, detected_format)
+					else:
+						success = unarc.extract_entry(current_archive_path, entry_name, global_output_path)
+				elif current_format in ["7z", "zip", "rar"]:
+					success = unarc.extract_entry_with_format(current_archive_path, entry_name, global_output_path, current_format)
 				else:
 					success = unarc.extract_entry(current_archive_path, entry_name, global_output_path)
 		
@@ -403,11 +461,20 @@ func _on_extract_to_disk_pressed() -> void:
 		text_preview.show()
 		image_preview.hide()
 		hex_preview.hide()
-		text_preview.text = "¡ARCHIVO VOLCADO AL DISCO POR STREAMING CON ÉXITO!\n\n" + \
-			"Ruta local: " + output_file_path + "\n" + \
-			"Ruta global: " + global_output_path + "\n" + \
-			"Tamaño unificado: " + _format_size(selected_entry_metadata["size"]) + "\n\n" + \
-			"Este método realiza streaming nativo directo, por lo que el archivo nunca saturó tu memoria RAM. ¡Perfecto para archivos pesados!"
+		if _multi_volume_fallback_flag:
+			text_preview.text = "¡ARCHIVO VOLCADO AL DISCO CON ÉXITO! (vía RAM fallback)\n\n" + \
+				"Ruta local: " + output_file_path + "\n" + \
+				"Ruta global: " + global_output_path + "\n" + \
+				"Tamaño unificado: " + _format_size(selected_entry_metadata["size"]) + "\n\n" + \
+				"⚠️ AVISO: El streaming multi-volumen directo a disco aún no está implementado en la extensión Rust.\n" + \
+				"Se usó un fallback que carga los bytes en RAM antes de escribirlos a disco.\n" + \
+				"Para archivos muy grandes (>1GB) esto podría saturar la memoria."
+		else:
+			text_preview.text = "¡ARCHIVO VOLCADO AL DISCO POR STREAMING CON ÉXITO!\n\n" + \
+				"Ruta local: " + output_file_path + "\n" + \
+				"Ruta global: " + global_output_path + "\n" + \
+				"Tamaño unificado: " + _format_size(selected_entry_metadata["size"]) + "\n\n" + \
+				"Este método realiza streaming nativo directo, por lo que el archivo nunca saturó tu memoria RAM. ¡Perfecto para archivos pesados!"
 	else:
 		progress_bar.value = 0
 		status_label.text = "[Error] No se pudo volcar el archivo al disco."
@@ -484,3 +551,21 @@ func _format_size(bytes: int) -> String:
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://example_godot/unarc_test/example_unarc.tscn")
+
+
+func obtener_formato(archivos: Array[String]) -> String:
+	var permitidos = ["7z", "rar", "zip"]
+	
+	for ruta in archivos:
+		var nombre = ruta.get_file()
+		var ext = nombre.get_extension().to_lower()
+		
+		# Limpieza: Si es un número (001) o empieza con "part" (part1, part02)
+		if ext.is_valid_int() or ext.begins_with("part"):
+			nombre = nombre.get_basename()
+			ext = nombre.get_extension().to_lower()
+		
+		if ext in permitidos:
+			return ext
+			
+	return ""
