@@ -1,7 +1,10 @@
 extends Control
 
 
-
+func _ready() -> void:
+	prints("es un prints")
+	print("es un print")
+	
 
 
 func _on_nostr_pressed() -> void:
@@ -107,4 +110,9 @@ func _on_compr_pressed() -> void:
 	
 	prints("⭐️ DATOS AL NODO INSTANCIADO ⭐️" )
 	pass # Replace with function body.
+	pass # Replace with function body.
+
+
+func _on_timer_timeout() -> void:
+	prints("control godot ")
 	pass # Replace with function body.

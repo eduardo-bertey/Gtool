@@ -127,6 +127,10 @@ wrap_mode = 1
 indent_wrapped_lines = true
 tab_input_mode = false
 
+[node name="Timer" type="Timer" parent="." unique_id=117581942]
+wait_time = 1.803
+autostart = true
+
 [connection signal="mouse_entered" from="TabContainer/nostr gift" to="TabContainer/nostr gift" method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="TabContainer/nostr gift" to="TabContainer/nostr gift" method="_on_mouse_exited"]
 [connection signal="pressed" from="TabContainer/nostr gift" to="." method="_on_nostr_gift_pressed"]
@@ -151,3 +155,4 @@ tab_input_mode = false
 [connection signal="mouse_entered" from="TabContainer/itorrent" to="TabContainer/itorrent" method="_on_mouse_entered"]
 [connection signal="pressed" from="TabContainer/itorrent" to="." method="_on_itorrent_pressed"]
 [connection signal="pressed" from="TabContainer/compr" to="." method="_on_compr_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
