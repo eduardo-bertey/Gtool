@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://example_godot/tokenizer/tokenizer_example.gd" id="1_tok"]
+
+[node name="TokenizerExample" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tok")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 600.0
+offset_bottom = 55.0
+text = "Tokenizer (Hugging Face tokenizer.json)"
+font_size = 24
+
+[node name="path_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 900.0
+offset_bottom = 85.0
+
+[node name="status_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 85.0
+offset_right = 900.0
+offset_bottom = 110.0
+
+[node name="input" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 130.0
+offset_right = 780.0
+offset_bottom = 160.0
+
+[node name="Encode" type="Button" parent="."]
+layout_mode = 0
+offset_left = 790.0
+offset_top = 130.0
+offset_right = 890.0
+offset_bottom = 160.0
+text = "Encode"
+
+[node name="Decode" type="Button" parent="."]
+layout_mode = 0
+offset_left = 900.0
+offset_top = 130.0
+offset_right = 1000.0
+offset_bottom = 160.0
+text = "Decode"
+
+[node name="ids_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 180.0
+offset_right = 1000.0
+offset_bottom = 210.0
+autowrap_mode = 2
+
+[node name="tokens_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 215.0
+offset_right = 1000.0
+offset_bottom = 245.0
+autowrap_mode = 2
+
+[node name="decoded_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 250.0
+offset_right = 1000.0
+offset_bottom = 280.0
+autowrap_mode = 2
+
+[connection signal="pressed" from="Encode" to="." method="_on_encode_pressed"]
+[connection signal="pressed" from="Decode" to="." method="_on_decode_pressed"]
