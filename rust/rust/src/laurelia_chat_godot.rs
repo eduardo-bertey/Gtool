@@ -1,10 +1,7 @@
-use godot::classes::ProjectSettings;
 use godot::prelude::*;
 use candle_core::{DType, Device, Result, Tensor};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::Mutex;
-
-use hf_hub::HFClientSync;
 
 use xlstm::blocks::laurelia::weights::Weights;
 use xlstm::blocks::laurelia::{Config, LaureliaTokenizer, LLM};
@@ -63,39 +60,23 @@ impl INode for LaureliaChat {
 
 #[godot_api]
 impl LaureliaChat {
-    /// Descarga tokenizer + checkpoint desde HuggingFace (si auto_download)
-    /// y carga el modelo en memoria. Retorna true si tuvo éxito.
+    /// Carga tokenizer + checkpoint desde rutas locales (la descarga la hace
+    /// la escena con HTTPRequest de Godot). Retorna true si tuvo éxito.
     #[func]
     pub fn load_model(&mut self) -> bool {
         let ckpt_path: String = self.checkpoint_file.to_string();
         let tok_path: String = self.tokenizer_file.to_string();
 
-        // Resolver rutas: si los archivos ya existen, cargar local sin descargar.
-        let (weights_path, tokenizer_path) = if Path::new(&ckpt_path).exists()
-            && Path::new(&tok_path).exists()
-        {
-            (ckpt_path, tok_path)
-        } else if self.auto_download {
-            match Self::download(
-                &self.hf_org.to_string(),
-                &self.hf_repo.to_string(),
-                &ckpt_path,
-                &tok_path,
-            ) {
-                Ok(p) => p,
-                Err(e) => {
-                    godot_error!("LaureliaChat: fallo al descargar desde HF: {}", e);
-                    return false;
-                }
-            }
-        } else {
-            godot_error!(
-                "LaureliaChat: archivos no encontrados: {} y {}",
-                ckpt_path,
-                tok_path
-            );
+        if !Path::new(&ckpt_path).exists() {
+            godot_error!("LaureliaChat: no existe {}", ckpt_path);
             return false;
-        };
+        }
+        if !Path::new(&tok_path).exists() {
+            godot_error!("LaureliaChat: no existe {}", tok_path);
+            return false;
+        }
+
+        let (weights_path, tokenizer_path) = (ckpt_path, tok_path);
 
         let dtype = DType::F32;
 
@@ -226,51 +207,5 @@ impl LaureliaChat {
     pub fn unload_model(&self) {
         *self.model.lock().unwrap() = None;
         *self.tokenizer.lock().unwrap() = None;
-    }
-}
-
-impl LaureliaChat {
-    fn download(
-        org: &str,
-        repo: &str,
-        ckpt_file: &str,
-        tok_file: &str,
-    ) -> Result<(String, String)> {
-        let local_dir = ProjectSettings::singleton()
-            .globalize_path("user://hf_models/laurelia")
-            .to_string();
-        if !Path::new(&local_dir).exists() {
-            std::fs::create_dir_all(&local_dir).map_err(|e| {
-                candle_core::Error::Msg(format!("creando dir {local_dir}: {e}"))
-            })?;
-        }
-
-        let client = HFClientSync::new()
-            .map_err(|e| candle_core::Error::Msg(format!("hf-hub api: {e}")))?;
-
-        let ckpt = client
-            .model(org, repo)
-            .download_file()
-            .filename(ckpt_file.to_string())
-            .local_dir(PathBuf::from(&local_dir))
-            .send()
-            .map_err(|e| {
-                candle_core::Error::Msg(format!("hf download {ckpt_file}: {e}"))
-            })?;
-
-        let tok = client
-            .model(org, repo)
-            .download_file()
-            .filename(tok_file.to_string())
-            .local_dir(PathBuf::from(&local_dir))
-            .send()
-            .map_err(|e| {
-                candle_core::Error::Msg(format!("hf download {tok_file}: {e}"))
-            })?;
-
-        Ok((
-            ckpt.to_string_lossy().to_string(),
-            tok.to_string_lossy().to_string(),
-        ))
     }
 }
