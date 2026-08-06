@@ -34,6 +34,16 @@ offset_right = 1000.0
 offset_bottom = 90.0
 text = "Descargar"
 
+[node name="model" type="OptionButton" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 92.0
+offset_right = 320.0
+offset_bottom = 120.0
+item_count = 2
+popup/item_0/text = "Base (checkpoint.pt)"
+popup/item_1/text = "Fine-tuned (fine-checkpoint.pt)"
+
 [node name="load" type="Button" parent="."]
 layout_mode = 0
 offset_left = 1010.0
@@ -45,30 +55,30 @@ text = "Cargar"
 [node name="generate" type="Button" parent="."]
 layout_mode = 0
 offset_left = 20.0
-offset_top = 110.0
+offset_top = 130.0
 offset_right = 120.0
-offset_bottom = 140.0
+offset_bottom = 160.0
 text = "Generar"
 
 [node name="unload" type="Button" parent="."]
 layout_mode = 0
 offset_left = 130.0
-offset_top = 110.0
+offset_top = 130.0
 offset_right = 230.0
-offset_bottom = 140.0
+offset_bottom = 160.0
 text = "Liberar"
 
 [node name="output" type="Label" parent="."]
 layout_mode = 0
 offset_left = 20.0
-offset_top = 160.0
+offset_top = 170.0
 offset_right = 1100.0
-offset_bottom = 460.0
+offset_bottom = 470.0
 autowrap_mode = 2
 
 [node name="stats" type="Label" parent="."]
 layout_mode = 0
 offset_left = 20.0
-offset_top = 470.0
+offset_top = 480.0
 offset_right = 1100.0
-offset_bottom = 490.0
+offset_bottom = 500.0
