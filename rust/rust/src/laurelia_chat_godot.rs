@@ -137,14 +137,16 @@ impl LaureliaChat {
     /// Genera texto a partir de un prompt. Usa los parámetros exportados.
     #[func]
     pub fn generate(&self, prompt: GString) -> GString {
-        let model = match self.model.lock().unwrap().as_ref() {
+        let model_guard = self.model.lock().unwrap();
+        let model = match model_guard.as_ref() {
             Some(m) => m,
             None => {
                 godot_error!("LaureliaChat: modelo no cargado. Llamá load_model() primero.");
                 return GString::new();
             }
         };
-        let tokenizer = match self.tokenizer.lock().unwrap().as_ref() {
+        let tokenizer_guard = self.tokenizer.lock().unwrap();
+        let tokenizer = match tokenizer_guard.as_ref() {
             Some(t) => t,
             None => return GString::new(),
         };
