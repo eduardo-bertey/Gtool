@@ -197,7 +197,7 @@ impl LaureliaChat {
         };
 
         match tokenizer.decode(&ids_out) {
-            Ok(text) => GString::from(text),
+            Ok(text) => text.as_str().into(),
             Err(e) => {
                 godot_error!("LaureliaChat: error decodificando: {}", e);
                 GString::new()
