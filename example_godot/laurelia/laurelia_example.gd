@@ -79,12 +79,12 @@ func _generate() -> void:
 	$output.text = "Generando..."
 	$stats.text = ""
 	await get_tree().process_frame
-	var start := Time.get_ticks_msec()
-	var out := chat.generate($input.text)
+	var start: int = Time.get_ticks_msec()
+	var out: String = String(chat.generate($input.text))
 	$output.text = out
-	var elapsed := (Time.get_ticks_msec() - start) / 1000.0
-	var tokens := chat.max_new_tokens
-	var tps := tokens / elapsed if elapsed > 0.0 else 0.0
+	var elapsed: float = float(Time.get_ticks_msec() - start) / 1000.0
+	var tokens: int = int(chat.max_new_tokens)
+	var tps: float = float(tokens) / elapsed if elapsed > 0.0 else 0.0
 	$stats.text = "%.1f s | %d tokens generados | %.1f tok/s" % [elapsed, tokens, tps]
 	print("generation stats: %.1f s | %d tokens | %.1f tok/s" % [elapsed, tokens, tps])
 	_status("Listo.")
