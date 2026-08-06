@@ -65,3 +65,10 @@ offset_top = 160.0
 offset_right = 1100.0
 offset_bottom = 460.0
 autowrap_mode = 2
+
+[node name="stats" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 470.0
+offset_right = 1100.0
+offset_bottom = 490.0
