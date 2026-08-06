@@ -1,10 +1,10 @@
 use godot::classes::ProjectSettings;
 use godot::prelude::*;
 use candle_core::{DType, Device, Result, Tensor};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
-use crate::hf_godot::HFGodot;
+use hf_hub::HFClientSync;
 
 use xlstm::blocks::laurelia::weights::Weights;
 use xlstm::blocks::laurelia::{Config, LaureliaTokenizer, LLM};
@@ -236,29 +236,32 @@ impl LaureliaChat {
             })?;
         }
 
-        let repo_id: GString = format!("{org}/{repo}").into();
-        let mut hf = HFGodot::new_gd();
-        hf.init_client("".into());
+        let client = HFClientSync::new()
+            .map_err(|e| candle_core::Error::Msg(format!("hf-hub api: {e}")))?;
 
-        let ckpt = hf.download_file(
-            repo_id.clone(),
-            ckpt_file.into(),
-            local_dir.clone().into(),
-            "model".into(),
-        );
-        let tok = hf.download_file(
-            repo_id,
-            tok_file.into(),
-            local_dir.clone().into(),
-            "model".into(),
-        );
+        let ckpt = client
+            .model(org, repo)
+            .download_file()
+            .filename(ckpt_file.to_string())
+            .local_dir(PathBuf::from(&local_dir))
+            .send()
+            .map_err(|e| {
+                candle_core::Error::Msg(format!("hf download {ckpt_file}: {e}"))
+            })?;
 
-        if ckpt.is_empty() || tok.is_empty() {
-            return Err(candle_core::Error::Msg(
-                "HFGodot: fallo la descarga del modelo".into(),
-            ));
-        }
+        let tok = client
+            .model(org, repo)
+            .download_file()
+            .filename(tok_file.to_string())
+            .local_dir(PathBuf::from(&local_dir))
+            .send()
+            .map_err(|e| {
+                candle_core::Error::Msg(format!("hf download {tok_file}: {e}"))
+            })?;
 
-        Ok((ckpt.to_string(), tok.to_string()))
+        Ok((
+            ckpt.to_string_lossy().to_string(),
+            tok.to_string_lossy().to_string(),
+        ))
     }
 }
