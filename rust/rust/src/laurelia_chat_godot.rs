@@ -70,8 +70,12 @@ impl LaureliaChat {
         let ckpt_path: String = self.checkpoint_file.to_string();
         let tok_path: String = self.tokenizer_file.to_string();
 
-        // Resolver rutas: descarga automática o local
-        let (weights_path, tokenizer_path) = if self.auto_download {
+        // Resolver rutas: si los archivos ya existen, cargar local sin descargar.
+        let (weights_path, tokenizer_path) = if Path::new(&ckpt_path).exists()
+            && Path::new(&tok_path).exists()
+        {
+            (ckpt_path, tok_path)
+        } else if self.auto_download {
             match Self::download(
                 &self.hf_org.to_string(),
                 &self.hf_repo.to_string(),
@@ -85,7 +89,12 @@ impl LaureliaChat {
                 }
             }
         } else {
-            (ckpt_path, tok_path)
+            godot_error!(
+                "LaureliaChat: archivos no encontrados: {} y {}",
+                ckpt_path,
+                tok_path
+            );
+            return false;
         };
 
         let dtype = DType::F32;
