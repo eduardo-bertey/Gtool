@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://example_godot/laurelia/laurelia_example.gd" id="1_llm"]
+
+[node name="LaureliaExample" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_llm")
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 900.0
+offset_bottom = 55.0
+text = "LaureliaChat — LLM (Candle + HuggingFace)"
+font_size = 24
+
+[node name="path_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 1100.0
+offset_bottom = 85.0
+
+[node name="status_label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 85.0
+offset_right = 1100.0
+offset_bottom = 110.0
+
+[node name="input" type="LineEdit" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 130.0
+offset_right = 880.0
+offset_bottom = 160.0
+text = "Escribe una historia corta sobre un robot explorador:"
+
+[node name="load_button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 890.0
+offset_top = 130.0
+offset_right = 1000.0
+offset_bottom = 160.0
+text = "Cargar modelo"
+
+[node name="generate_button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 120.0
+offset_bottom = 200.0
+text = "Generar"
+
+[node name="unload_button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 170.0
+offset_right = 230.0
+offset_bottom = 200.0
+text = "Liberar"
+
+[node name="output" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 220.0
+offset_right = 1100.0
+offset_bottom = 420.0
+autowrap_mode = 2

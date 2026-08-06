@@ -71,3 +71,4 @@ mod xlstm_large_node;
 mod minrnn_node;
 mod unarc_godot;
 mod tokenizer_godot;
+mod laurelia_chat_godot;
