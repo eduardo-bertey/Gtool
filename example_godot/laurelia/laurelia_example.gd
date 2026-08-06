@@ -86,6 +86,7 @@ func _generate() -> void:
 	var tokens := chat.max_new_tokens
 	var tps := tokens / elapsed if elapsed > 0.0 else 0.0
 	$stats.text = "%.1f s | %d tokens generados | %.1f tok/s" % [elapsed, tokens, tps]
+	print("generation stats: %.1f s | %d tokens | %.1f tok/s" % [elapsed, tokens, tps])
 	_status("Listo.")
 
 func _unload() -> void:
