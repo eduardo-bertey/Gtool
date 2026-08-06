@@ -298,21 +298,21 @@ impl HFGodot {
             "dataset" => {
                 client.delete_repository()
                     .repo_type(RepoTypeDataset)
-                    .repo_id(repo_id_str.as_str())
+                    .repo_id(repo_id_str)
                     .missing_ok(true)
                     .send()
             }
             "space" => {
                 client.delete_repository()
                     .repo_type(RepoTypeSpace)
-                    .repo_id(repo_id_str.as_str())
+                    .repo_id(repo_id_str)
                     .missing_ok(true)
                     .send()
             }
             _ => {
                 client.delete_repository()
                     .repo_type(RepoTypeModel)
-                    .repo_id(repo_id_str.as_str())
+                    .repo_id(repo_id_str)
                     .missing_ok(true)
                     .send()
             }
@@ -347,7 +347,7 @@ impl HFGodot {
             "dataset" => {
                 client.create_repository()
                     .repo_type(RepoTypeDataset)
-                    .repo_id(repo_id_str.as_str())
+                    .repo_id(repo_id_str)
                     .private(private)
                     .exist_ok(true)
                     .send()
@@ -355,7 +355,7 @@ impl HFGodot {
             "space" => {
                 client.create_repository()
                     .repo_type(RepoTypeSpace)
-                    .repo_id(repo_id_str.as_str())
+                    .repo_id(repo_id_str)
                     .private(private)
                     .exist_ok(true)
                     .send()
@@ -363,7 +363,7 @@ impl HFGodot {
             _ => {
                 client.create_repository()
                     .repo_type(RepoTypeModel)
-                    .repo_id(repo_id_str.as_str())
+                    .repo_id(repo_id_str)
                     .private(private)
                     .exist_ok(true)
                     .send()
@@ -481,19 +481,19 @@ impl HFGodot {
             "dataset" => {
                 client.dataset(namespace, name)
                     .file_exists()
-                    .filename(filename_str.as_str())
+                    .filename(filename_str)
                     .send()
             }
             "space" => {
                 client.space(namespace, name)
                     .file_exists()
-                    .filename(filename_str.as_str())
+                    .filename(filename_str)
                     .send()
             }
             _ => {
                 client.model(namespace, name)
                     .file_exists()
-                    .filename(filename_str.as_str())
+                    .filename(filename_str)
                     .send()
             }
         };
