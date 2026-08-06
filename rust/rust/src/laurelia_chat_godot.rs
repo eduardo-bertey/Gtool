@@ -1,9 +1,10 @@
+use godot::classes::ProjectSettings;
 use godot::prelude::*;
 use candle_core::{DType, Device, Result, Tensor};
 use std::path::Path;
 use std::sync::Mutex;
 
-use hf_hub::HFClientSync;
+use crate::hf_godot::HFGodot;
 
 use xlstm::blocks::laurelia::weights::Weights;
 use xlstm::blocks::laurelia::{Config, LaureliaTokenizer, LLM};
@@ -74,7 +75,6 @@ impl LaureliaChat {
             match Self::download(
                 &self.hf_org.to_string(),
                 &self.hf_repo.to_string(),
-                &self.hf_revision.to_string(),
                 &ckpt_path,
                 &tok_path,
             ) {
@@ -224,36 +224,41 @@ impl LaureliaChat {
     fn download(
         org: &str,
         repo: &str,
-        revision: &str,
         ckpt_file: &str,
         tok_file: &str,
     ) -> Result<(String, String)> {
-        let client = HFClientSync::new()
-            .map_err(|e| candle_core::Error::Msg(format!("hf-hub api: {e}")))?;
-
-        let ckpt = client
-            .model(org, repo)
-            .download_file()
-            .filename(ckpt_file.to_string())
-            .revision(revision.to_string())
-            .send()
-            .map_err(|e| {
-                candle_core::Error::Msg(format!("hf download {ckpt_file}: {e}"))
+        let local_dir = ProjectSettings::singleton()
+            .globalize_path("user://hf_models/laurelia")
+            .to_string();
+        if !Path::new(&local_dir).exists() {
+            std::fs::create_dir_all(&local_dir).map_err(|e| {
+                candle_core::Error::Msg(format!("creando dir {local_dir}: {e}"))
             })?;
+        }
 
-        let tok = client
-            .model(org, repo)
-            .download_file()
-            .filename(tok_file.to_string())
-            .revision(revision.to_string())
-            .send()
-            .map_err(|e| {
-                candle_core::Error::Msg(format!("hf download {tok_file}: {e}"))
-            })?;
+        let repo_id: GString = format!("{org}/{repo}").into();
+        let mut hf = HFGodot::new_gd();
+        hf.init_client("".into());
 
-        Ok((
-            ckpt.to_string_lossy().to_string(),
-            tok.to_string_lossy().to_string(),
-        ))
+        let ckpt = hf.download_file(
+            repo_id.clone(),
+            ckpt_file.into(),
+            local_dir.clone().into(),
+            "model".into(),
+        );
+        let tok = hf.download_file(
+            repo_id,
+            tok_file.into(),
+            local_dir.clone().into(),
+            "model".into(),
+        );
+
+        if ckpt.is_empty() || tok.is_empty() {
+            return Err(candle_core::Error::Msg(
+                "HFGodot: fallo la descarga del modelo".into(),
+            ));
+        }
+
+        Ok((ckpt.to_string(), tok.to_string()))
     }
 }

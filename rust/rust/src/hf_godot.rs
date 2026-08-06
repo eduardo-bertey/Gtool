@@ -569,3 +569,9 @@ impl HFGodot {
         results
     }
 }
+
+impl HFGodot {
+    pub fn new_gd() -> Gd<Self> {
+        Gd::from_init_fn(|base| Self { client: None, base })
+    }
+}
