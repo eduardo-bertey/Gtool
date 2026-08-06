@@ -1,114 +1,87 @@
 extends Control
 
-## Ejemplo de LaureliaChat (LLM Candle).
-## Descarga el modelo con HTTPRequest nativo de Godot (funciona en Android,
-## a diferencia de hf-hub/reqwest que paniquea con rustls-platform-verifier).
-
 var chat = LaureliaChat.new()
 var http = HTTPRequest.new()
 
-const HF_ORG_REPO := "ScortexIA/laurelia"
-const REVISION := "laurelia-llm"
-const CKPT_FILE := "checkpoint.pt"
-const TOK_FILE := "tokenizer.json"
-const LOCAL_DIR := "user://hf_models/laurelia"
+const URL := "https://huggingface.co/ScortexIA/laurelia/resolve/laurelia-llm/"
+const CKPT := "checkpoint.pt"
+const TOK := "tokenizer.json"
+const DIR := "user://hf_models/laurelia"
+
+var _file := ""
 
 func _ready() -> void:
-	$path_label.text = "Repo: %s @ %s" % [HF_ORG_REPO, REVISION]
-	$status_label.text = "Esperando... hacé clic en Descargar modelo"
-
-	http.timeout = 0
-	http.request_completed.connect(_on_request_completed)
+	http.request_completed.connect(_on_done)
 	add_child(http)
+	$download.pressed.connect(_download)
+	$load.pressed.connect(_load)
+	$generate.pressed.connect(_generate)
+	$unload.pressed.connect(_unload)
+	_status("Listo. Tocá Descargar o Cargar.")
 
-	$download_button.pressed.connect(_on_download_pressed)
-	$load_button.pressed.connect(_on_load_pressed)
-	$generate_button.pressed.connect(_on_generate_pressed)
-	$unload_button.pressed.connect(_on_unload_pressed)
+func _path(name: String) -> String:
+	return ProjectSettings.globalize_path(DIR).path_join(name)
 
-func _hf_url(filename: String) -> String:
-	return "https://huggingface.co/%s/resolve/%s/%s" % [HF_ORG_REPO, REVISION, filename]
+func _have() -> bool:
+	return FileAccess.file_exists(_path(CKPT)) and FileAccess.file_exists(_path(TOK))
 
-func _download_file(filename: String) -> void:
-	var url := _hf_url(filename)
-	$status_label.text = "Descargando %s..." % filename
-	http.request(url)
+func _status(msg: String) -> void:
+	$status.text = msg
 
-func _on_request_completed(result: int, code: int, headers: PackedStringArray, body: PackedByteArray) -> void:
+func _download() -> void:
+	if _have():
+		_status("Ya está el modelo.")
+		return
+	$download.disabled = true
+	_file = CKPT
+	_status("Descargando checkpoint...")
+	http.request(URL + CKPT)
+
+func _on_done(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
-		$status_label.text = "❌ Falló la descarga (HTTP %d, result %d). Mirá la consola." % [code, result]
-		$download_button.disabled = false
-		$download_button.text = "Descargar modelo"
+		$download.disabled = false
+		_status("Error HTTP %d." % code)
 		return
-
-	var dir := DirAccess.open(LOCAL_DIR)
-	if dir == null:
-		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(LOCAL_DIR))
-	var path := ProjectSettings.globalize_path(LOCAL_DIR).path_join(_current_file)
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f == null:
-		$status_label.text = "❌ No se pudo escribir %s" % path
-		$download_button.disabled = false
-		$download_button.text = "Descargar modelo"
-		return
+	var dir := ProjectSettings.globalize_path(DIR)
+	DirAccess.make_dir_recursive_absolute(dir)
+	var f := FileAccess.open(_path(_file), FileAccess.WRITE)
 	f.store_buffer(body)
 	f.close()
-
-	$status_label.text = "✓ Descargado %s (%s)" % [_current_file, _fmt_bytes(body.size())]
-
-	if _current_file == CKPT_FILE:
-		chat.checkpoint_file = path
-		_current_file = TOK_FILE
-		_download_file(TOK_FILE)
+	if _file == CKPT:
+		_file = TOK
+		_status("Descargando tokenizer...")
+		http.request(URL + TOK)
 	else:
-		chat.tokenizer_file = path
-		chat.auto_download = false
-		$download_button.disabled = false
-		$download_button.text = "Descargar modelo"
-		$status_label.text = "Modelo descargado ✓. Ahora tocá Cargar modelo."
+		$download.disabled = false
+		_status("Modelo descargado. Tocá Cargar.")
 
-func _fmt_bytes(n: int) -> String:
-	if n >= 1048576:
-		return "%.1f MB" % (n / 1048576.0)
-	if n >= 1024:
-		return "%.1f KB" % (n / 1024.0)
-	return "%d B" % n
-
-var _current_file := ""
-
-func _on_download_pressed() -> void:
-	$download_button.disabled = true
-	$download_button.text = "Descargando..."
-	_current_file = CKPT_FILE
-	_download_file(CKPT_FILE)
-
-func _on_load_pressed() -> void:
-	if chat.checkpoint_file == "" or chat.tokenizer_file == "":
-		$status_label.text = "Primero descargá el modelo."
+func _load() -> void:
+	if not _have():
+		_status("Primero descargá el modelo.")
 		return
-	$status_label.text = "Cargando modelo en memoria..."
-	$load_button.disabled = true
-	$load_button.text = "Cargando..."
+	chat.checkpoint_file = _path(CKPT)
+	chat.tokenizer_file = _path(TOK)
+	chat.auto_download = false
+	$load.disabled = true
+	_status("Cargando modelo...")
 	await get_tree().process_frame
-
-	var ok := chat.load_model()
-
-	$load_button.disabled = false
-	$load_button.text = "Cargar modelo"
-	if ok:
-		$status_label.text = "Modelo cargado ✓"
+	if chat.load_model():
+		$load.disabled = false
+		_status("Modelo cargado. Tocá Generar.")
 	else:
-		$status_label.text = "❌ Falló la carga. Mirá la consola."
+		$load.disabled = false
+		_status("Error al cargar. Mirá la consola.")
 
-func _on_generate_pressed() -> void:
+func _generate() -> void:
 	if not chat.is_loaded():
-		$status_label.text = "Primero cargá el modelo."
+		_status("Primero cargá el modelo.")
 		return
 	$output.text = "Generando..."
 	await get_tree().process_frame
 	$output.text = chat.generate($input.text)
+	_status("Listo.")
 
-func _on_unload_pressed() -> void:
+func _unload() -> void:
 	chat.unload_model()
-	$status_label.text = "Modelo liberado."
 	$output.text = ""
+	_status("Modelo liberado.")
